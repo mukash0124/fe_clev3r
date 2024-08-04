@@ -17,8 +17,6 @@ count = 0
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 
-test
-
 
 While 1=1
   AdvGyro.WritePort2(angle)
