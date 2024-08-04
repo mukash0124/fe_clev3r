@@ -1,0 +1,61 @@
+'Name: EV3 AdvGyro module
+'Version: 1.0
+'Author: Robotek Mukash Madi 2024/08/02
+'---------------------------------
+
+import "ToolBox"
+
+number gyro_angle
+number gyro_last
+
+Function WritePort1(out number angle)
+  value = Sensor1.Raw1()
+  ToolBox.AngleWrap(value, wrapped_angle)
+  angle = wrapped_angle - gyro_last
+  gyro_angle = angle
+EndFunction
+
+Function WritePort2(out number angle)
+  value = Sensor2.Raw1()
+  ToolBox.AngleWrap(value, wrapped_angle)
+  angle = wrapped_angle - gyro_last
+  gyro_angle = angle
+EndFunction
+
+Function WritePort3(out number angle)
+  value = Sensor3.Raw1()
+  ToolBox.AngleWrap(value, wrapped_angle)
+  angle = wrapped_angle - gyro_last
+  gyro_angle = angle
+EndFunction
+
+Function WritePort4(out number angle)
+  value = Sensor4.Raw1()
+  ToolBox.AngleWrap(value, wrapped_angle)
+  angle = wrapped_angle - gyro_last
+  gyro_angle = angle
+EndFunction
+
+Function Read(out number angle)
+  angle = gyro_angle
+EndFunction
+
+Function ResetPort1(in number angle)
+  value = Sensor1.Raw1()
+  gyro_last = value - angle
+EndFunction
+
+Function ResetPort2(in number angle)
+  value = Sensor2.Raw1()
+  gyro_last = value - angle
+EndFunction
+
+Function ResetPort3(in number angle)
+  value = Sensor3.Raw1()
+  gyro_last = value - angle
+EndFunction
+
+Function ResetPort4(in number angle)
+  value = Sensor4.Raw1()
+  gyro_last = value - angle
+EndFunction

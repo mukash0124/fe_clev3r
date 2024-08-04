@@ -1,0 +1,37 @@
+'Name: EV3 Advanced Encoder module
+'Version: 1.0
+'Author: Robotek Mukash Madi 2024/07/30
+'---------------------------------
+
+number lastA
+number lastB
+number lastC
+number lastD
+
+
+number last
+
+Function getEncChange(in string port, out number angle)
+  angle = Motor.GetCount(port) - last
+  last = Motor.GetCount(port)
+EndFunction
+
+Function getChangeA(out number encChange)
+  encChange = Motor.GetCount("A") - lastA
+  lastA = Motor.GetCount("A")
+EndFunction
+
+Function getChangeB(out number change)
+  encChange = Motor.GetCount("B") - lastB
+  lastB = Motor.GetCount("B")
+EndFunction
+
+Function getChangeC(out number change)
+  encChange = Motor.GetCount("C") - lastC
+  lastC = Motor.GetCount("C")
+EndFunction
+
+Function getChangeD(out number change)
+  encChange = Motor.GetCount("D") - lastD
+  lastC = Motor.GetCount("C")
+EndFunction

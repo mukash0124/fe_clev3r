@@ -1,0 +1,13 @@
+'Name: EV3 ToolBox module
+'Version: 1.0
+'Author: Robotek Mukash Madi 2024/08/02
+'---------------------------------
+
+Function AngleWrap(in number angle, out number wrapped_angle)
+  If angle < 0 Then
+    a = -180
+  Else
+    a = 180
+  EndIf
+  wrapped_angle = Math.Remainder((angle + a), 360) - a
+EndFunction
