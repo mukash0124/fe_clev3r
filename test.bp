@@ -18,8 +18,6 @@ Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 
 
-stgtsduyguf
-
 While 1=1
   AdvGyro.WritePort2(angle)
   'AdvEncoder.getEncChange("A", encChange)

@@ -1,0 +1,81 @@
+import "Mods\Odometry"
+import "Mods\Gyro"
+import "Mods\AdvEncoder"
+import "Mods\AdvGyro"
+import "Mods\ColorRGB"
+import "Mods\SteerControl"
+import "Mods\TestAdvGyro"
+import "Mods\Pixy2"
+import "Mods\Tool"
+
+LCD.Clear()
+Odometry.Config(15,43)
+AdvGyro.ResetPort2(0)
+ColorRGB.Config(10, 250, 10, 250, 10, 250)
+SteerControl.Config(0.5, 0, 0, 35, 0)
+
+Sensor.SetMode(2, 0)
+Sensor.SetMode(3, 4)
+
+dot_x = Row.Init(4, 1)
+Row.write(dot_x, 0, 0)
+Row.write(dot_x, 1, 0)
+Row.write(dot_x, 2, 0)
+Row.write(dot_x, 3, 0)
+
+dot_y = Row.Init(4, 1)
+Row.write(dot_y, 0, -60)
+Row.write(dot_y, 1, -40)
+Row.write(dot_y, 2, 20)
+Row.write(dot_y, 3, 40)
+
+isOrange = 0
+lineCheck = 1
+walldistance = 0
+chas = 0
+turncounter=0
+i = 0
+
+ColorRGB.ReadPort3(r, g, b)
+Odometry.Read(X_odom, Y_odom)
+
+Function colorupdate()
+  ColorRGB.ReadPort3(r, g, b)
+  if b < 50 then
+    lineCheck = 1
+    if r > 80 then
+      IsOrange = 1
+    Else
+      IsOrange = 0
+    EndIf
+    MotorA.ResetCount
+  Else
+    lineCheck = 0
+  EndIf
+EndFunction
+Function resetodometry(out number od_x, out number od_y)
+  Sensor4.raw = walldistance
+  walldistance - 34 = od_y
+  wall distance - 42.5 / tan(30) = od_x
+EndFunction
+Function turnreset(in number turn_degree)
+  if chas=1 then 
+    AdvGyro.ResetPort2(turn_degree + AdvGyro.Read())
+  Else
+    AdvGyro.ResetPort2(AdvGyro.Read() - turn_degree)
+  EndIf
+  turncounter=turncounter+1
+  MotorA.ResetCount
+EndFunction
+Function STP (in number x_od, in number y_od, in number x, in number y)
+  Tool.atan2(x - x_od, y - y_od, atan)
+  SteerControl.SetTarget(AdvGyro.Read - atan)
+EndFunction
+Function DTP()
+  While i < 4
+    While Row.Read(dot_x, i)-5 >= X_odom
+    STP(X_odom, Y_odom, Row.Read(dot_x , i), Row.Read(dot_y , i))
+    EndWhile
+    i=i+1
+  EndWhile
+EndFunction
