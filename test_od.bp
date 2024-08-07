@@ -79,3 +79,9 @@ Function DTP()
     i=i+1
   EndWhile
 EndFunction
+Function color(out number IsWhite, out number IsOrange)
+  If lineCheck = 1 then
+    lineChcek = 0
+    IsOrange = 1
+  EndIf
+EndFunction
