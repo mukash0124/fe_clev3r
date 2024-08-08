@@ -29,12 +29,17 @@ Row.write(dot_y, 1, -40)
 Row.write(dot_y, 2, 20)
 Row.write(dot_y, 3, 40)
 
+Gyrokp = 2
+Gyrokd = 1.5
+GyroOld = 0
 isOrange = 0
 lineCheck = 1
 walldistance = 0
 chas = 0
 turncounter=0
 i = 0
+IsWhite = 0
+color(IsWhite,isOrange)
 
 ColorRGB.ReadPort3(r, g, b)
 Odometry.Read(X_odom, Y_odom)
@@ -84,4 +89,17 @@ Function color(out number IsWhite, out number IsOrange)
     lineChcek = 0
     IsOrange = 1
   EndIf
+EndFunction
+Function GyroCore(in number delta, out number aim)
+  Gyrokp * delta + Gyrokd * (delta - GyroOld) = aim
+  delta = GyroOld
+EndFunction
+Function qualstart()
+  While IsWhite = 0
+    GyroCore(AdvGyro.Read, SteerControl.SetTarget)
+  EndWhile
+  chas = isOrange
+  resetodometry(od_x, od_y)
+  Odometry.Reset(od_x, od_y)
+  turnreset(90)
 EndFunction
