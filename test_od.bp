@@ -39,6 +39,7 @@ chas = 0
 turncounter=0
 i = 0
 IsWhite = 0
+neznaika = 0
 color(IsWhite,isOrange)
 
 ColorRGB.ReadPort3(r, g, b)
@@ -103,3 +104,23 @@ Function qualstart()
   Odometry.Reset(od_x, od_y)
   turnreset(90)
 EndFunction
+while turncounter < 11
+  DTP()
+  While neznaika = 0
+    GyroCore(AdvGyro.Read,SteerControl.SetTarget)
+    If IsWhite = 0 Then
+      If Chas = isOrange then
+        neznaika = 1
+      EndIf
+    EndIf
+  EndWhile
+  MotorA.ResetCount
+  neznaika = 0
+  turnreset(90)
+EndWhile
+while 1=1
+  SteerControl.Core(AdvEncoder.getChangeC,MotorC.StartPower)
+  If X > 50 then
+    colorupdate()
+  EndIf
+EndWhile
