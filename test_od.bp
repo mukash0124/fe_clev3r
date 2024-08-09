@@ -29,18 +29,28 @@ Row.write(dot_y, 1, -40)
 Row.write(dot_y, 2, 20)
 Row.write(dot_y, 3, 40)
 
+m1 = Thread.CreateMutex()
+X = 0
+Y = 0
+od_x = 0
+od_y = 0
+X_odom = 0
+Y_odom = 0
 Gyrokp = 2
 Gyrokd = 1.5
 GyroOld = 0
-isOrange = 0
+IsOrange = 0
 lineCheck = 1
 walldistance = 0
 chas = 0
-turncounter=0
+turncounter = 0
 i = 0
 IsWhite = 0
 neznaika = 0
-color(IsWhite,isOrange)
+atan = 0
+delta = 0
+turn_degree = 90
+color(IsWhite,IsOrange)
 
 ColorRGB.ReadPort3(r, g, b)
 Odometry.Read(X_odom, Y_odom)
@@ -73,7 +83,7 @@ Function turnreset(in number turn_degree)
   turncounter=turncounter+1
   MotorA.ResetCount
 EndFunction
-Function STP (in number x_od, in number y_od, in number x, in number y)
+Function STP (in number x_od, in number y_od, in number X, in number Y)
   Tool.atan2(x - x_od, y - y_od, atan)
   SteerControl.SetTarget(AdvGyro.Read - atan)
 EndFunction
@@ -87,7 +97,7 @@ Function DTP()
 EndFunction
 Function color(out number IsWhite, out number IsOrange)
   If lineCheck = 1 then
-    lineChcek = 0
+    lineCheck = 0
     IsOrange = 1
   EndIf
 EndFunction
@@ -104,6 +114,13 @@ Function qualstart()
   Odometry.Reset(od_x, od_y)
   turnreset(90)
 EndFunction
+sub WriteOdometry
+  while 1=1
+  Odometry.Write(AdvGyro.Read(),AdvEncoder.getChangeA())
+  EndWhile
+EndSub
+sub main
+  
 while turncounter < 11
   DTP()
   While neznaika = 0
@@ -118,9 +135,16 @@ while turncounter < 11
   neznaika = 0
   turnreset(90)
 EndWhile
+EndSub
+sub core
 while 1=1
   SteerControl.Core(AdvEncoder.getChangeC,MotorC.StartPower)
   If X > 50 then
     colorupdate()
   EndIf
 EndWhile
+EndSub
+
+Thread.Run = WriteOdometry
+Thread.Run = main
+Thread.Run = core
