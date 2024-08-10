@@ -1,0 +1,149 @@
+import "Mods\Odometry"
+import "Mods\Gyro"
+import "Mods\AdvEncoder"
+import "Mods\AdvGyro"
+import "Mods\ColorRGB"
+import "Mods\SteerControl"
+import "Mods\Pixy2"
+import "Mods\Tool"
+
+LCD.Clear()
+Odometry.Config(15,43)
+AdvGyro.ResetPort2(0)
+ColorRGB.Config(10, 250, 10, 250, 10, 250)
+SteerControl.Config(0.5, 0, 0, 35, 0)
+
+Sensor.SetMode(2, 0)
+Sensor.SetMode(3, 4)
+
+x_dot = Row.Init(4, 1)
+Row.write(x_dot, 0, 0)
+Row.write(x_dot, 1, 0)
+Row.write(x_dot, 2, 0)
+Row.write(x_dot, 3, 0)
+
+y_dot = Row.Init(4, 1)
+Row.write(y_dot, 0, -60)
+Row.write(y_dot, 1, -40)
+Row.write(y_dot, 2, 20)
+Row.write(y_dot, 3, 40)
+
+m1 = Thread.CreateMutex()
+
+gyroKp = 2
+gyroKd = 1.5
+gyroOld = 0
+clockWise = 0
+turnCounter = 0
+turnDegree = 90
+
+Sub UArt
+  AdvGyro.WritePort2()
+  AdvEncoder.getChangeA(encChangeA)
+  AdvEncoder.getChangeC(encChangeC)
+  ColorRGB.ReadPort3(r, g, b)
+  Sensor4.Raw1(WallDistance)
+EndSub
+
+sub I2C
+  Pixy2.getSignature(1 , 1, x_pixy, y_pixy, w_pixy, h_pixy)  
+EndSub  
+
+Sub Steering
+  SteerControl.Core(encChangeC, powerC)
+  MotorC.StartPower(powerC)
+  SteerControl.SetTarget(aim)
+EndSub
+
+Sub Odometry
+  While 1=1
+    AdvGyro.Read(gyroAngle)
+    Odometry.Write(gyroAngle, encChangeA)
+    Odometry.Read(X, Y)
+  EndWhile
+EndSub
+
+Function ColorCheck(out number isWhite, out number isOrange)
+  If b < 70 Then
+    isWhite = 1
+  Else
+    isWhite = 0
+  EndIf
+  If r > 80 Then
+    isOrange = 1
+  Else
+    isOrange = 0
+  Endif
+EndFunction
+
+Function resetodometry(out number X, out number Y)
+  wallDistance - 34 = Y
+  wallDistance - 42.5 / tan(30) = X
+EndFunction
+
+Function turnreset(in number turn_degree)
+  if clockWise = 1 then 
+    AdvGyro.ResetPort2(turnDegree + gyroAngle)
+  Else
+    AdvGyro.ResetPort2(gyroAngle - turnDegree)
+  EndIf
+  turnCounter=turnCounter+1
+  MotorA.ResetCount
+EndFunction
+
+Function STP(in number x, in number y)
+  Tool.atan2(x - X, y - Y, atan)
+  SteerControl.SetTarget(gyroAngle - atan)
+EndFunction
+
+Function DTP()
+  i = 0
+  While i < 4
+    While Row.Read(x_dot, i) - 5 >= X
+      STP(X, Y, Row.Read(x_dot, i), Row.Read(y_dot, i))
+    EndWhile
+    i=i+1
+  EndWhile
+EndFunction
+
+Function GyroCore(in number delta, out number aim)
+  gyroKp * delta + gyroKd * (delta - gyroOld) = aim
+  delta = gyroOld
+EndFunction
+
+Function qualstart()
+  While isWhite = 0
+    GyroCore(gyroAngle, aim)
+  EndWhile
+  clockWise = isOrange
+  resetodometry(X, Y)
+  Odometry.Reset(X, Y)
+  turnreset(90)
+EndFunction
+
+sub main 
+  while 1=1
+    qualstart()
+    while turncounter < 11
+      DTP()
+      While 1=1
+        GyroCore(gyroAngle, aim)
+        If isWhite = 0 And clockWise = isOrange Then
+          break
+        EndIf
+      EndWhile
+      MotorA.ResetCount()
+      resetodometry(X, Y)
+      Odometry.Reset(X, Y)
+      turnreset(90)
+    EndWhile
+    break
+  EndWhile
+EndSub
+   
+
+Thread.Run = Odometry
+Thread.Run = Main
+Thread.Run = UArt
+Thread.Run = I2C
+Thread.run = Steering
