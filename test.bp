@@ -1,37 +1,4 @@
-import "Mods\Odometry"
-import "Mods\Gyro"
-import "Mods\AdvEncoder"
-import "Mods\AdvGyro"
-import "Mods\ColorRGB"
-import "Mods\SteerControl"
-import "Mods\TestAdvGyro"
-
 LCD.Clear()
-Odometry.Config(8.57)
-AdvGyro.ResetPort2(0)
-ColorRGB.Config(10, 250, 10, 250, 10, 250)
-SteerControl.Config(0.5, 0, 0, 35, 0)
-
-
-count = 0
-Sensor.SetMode(2, 0)
-Sensor.SetMode(3, 4)
-
-
 While 1=1
-  AdvGyro.WritePort2(angle)
-  'AdvEncoder.getEncChange("A", encChange)
-  'Odometry.Write(angle, encChange)
-  'Odometry.Read(X, Y)
-  'ColorRGB.ReadPort3(r, g, b)
-  'LCD.Text(1, 5, 110, 2, encChange)
-  'SteerControl.Core(Motor.GetCount("C"), power)
-  'Motor.Start("C", power)
-  'SteerControl.SetTarget(30)
-  
-  If Time.Get1() > 10000 Then
-    LCD.Text(1, 5, 5, 2, count)
-  Else
-    count++
-  Endif
+  LCD.Text(1, 10, 10, 2, MotorA.GetTacho())
 EndWhile

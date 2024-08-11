@@ -1,9 +1,11 @@
 import "Mods\ColorRGB"
 
-MotorC.StartSpeed(50)
+Sensor.SetMode(3, 4)
+MotorC.StartPower(50)
 Program.Delay(2000)
 Motor.Move("C", -50, 71, "True")
-MotorAB.StartSpeed(30)
+MotorAB.StartPower(20)
+LCD.Clear()
 Rmin = 500
 Gmin = 500
 Bmin = 500
@@ -11,8 +13,11 @@ Rmax = -500
 Gmax = -500
 Bmax = -500
 col = EV3File.OpenWrite("col")
-While MotorA.GetTacho() < 400 Then
-  Sensor1.Raw3(r, g, b)
+r = 0
+g = 0
+b = 0
+While MotorA.GetTacho() < 400
+  Sensor3.Raw3(r, g, b)
   Rmin = Math.Min(Rmin, r)
   Rmax = Math.Max(Rmax, r)
   Gmin = Math.Min(Gmin, g)

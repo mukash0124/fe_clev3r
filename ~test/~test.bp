@@ -1,0 +1,4 @@
+LCD.Clear ()
+While 1 = 1
+LCD.Text ( 1 , 10 , 10 , 2 , MotorA.GetTacho () )
+EndWhile
