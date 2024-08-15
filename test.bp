@@ -1,4 +1,13 @@
+import "Mods\ToolBox"
+import "Mods\AdvGyro"
+
+Sensor.SetMode(2, 0)
+AdvGyro.ResetPort2(0)
+
 LCD.Clear()
 While 1=1
-  LCD.Text(1, 10, 10, 2, MotorA.GetTacho())
+  AdvGyro.WritePort2(angle)
+  ToolBox.AngleWrap(100, wrapped_angle)
+  LCD.Text(1, 10, 10, 2, angle)
+  LCD.Text(1, 10, 50, 2, wrapped_angle)
 EndWhile

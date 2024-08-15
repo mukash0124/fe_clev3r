@@ -10,6 +10,7 @@ import "Mods\Tool"
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 
+LCD.Clear()
 Odometry.Config(15.43)
 AdvGyro.ResetPort2(0)
 ColorRGB.Config(10, 250, 10, 250, 10, 250)
@@ -27,14 +28,13 @@ Row.write(y_dot, 1, -40)
 Row.write(y_dot, 2, 20)
 Row.write(y_dot, 3, 40)
 
-gyroKp = 2
-gyroKd = 1.5
+gyroKp = 1.5
+gyroKd = 3
 gyroOld = 0
 clockWise = 0
 turnCounter = 0
 turnDegree = 90
 fakeWheelBase = 14.5
-gyroAngle = 0
 
 col = EV3File.OpenRead("col")
 Rmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
@@ -69,7 +69,6 @@ Sub Steering
   While 1=1
     SteerControl.Core(encChangeC, powerC)
     MotorC.StartPower(powerC)
-    SteerControl.SetTarget(aim)
   EndWhile
 EndSub
 
@@ -81,12 +80,12 @@ Sub Odometry
 EndSub
 
 Function ColorCheck(out number isWhite, out number isOrange)
-  If b < 25 Then
+  If @b < 25 Then
     isWhite = 0
   Else
     isWhite = 1
   EndIf
-  If r > 50 Then
+  If @r > 50 Then
     isOrange = 1
   Else
     isOrange = 0
@@ -94,62 +93,62 @@ Function ColorCheck(out number isWhite, out number isOrange)
 EndFunction
 
 Function SteerToPoint(in number x, in number y)
-  deltaX = x - X
-  deltaY = y - Y
+  deltaX = x - @X
+  deltaY = y - @Y
   Tool.atan2(deltaX, deltaY, heading)
-  headingDifference = gyroAngle - heading
+  headingDifference = @gyroAngle - heading
   SteerControl.SetTarget(headingDifference)
 EndFunction
 
 Function DriveToPointUntilLine(in number x, in number y)
   isWhite = 1
-  isOrange = clockWise
-  While isWhite = 1 Or isOrange = clockWise
+  isOrange = @clockWise
+  While isWhite = 1 Or isOrange = @clockWise
     SteerToPoint(x, y)
     ColorCheck(isWhite, isOrange)
   EndWhile
 EndFunction
 
 Function DriveToPoint(in number x, in number y)
-  While X <= x - 5 Or Y <= y - 5 Or Y >= y - 5
+  While @X <= x - 5 Or @Y <= y - 5 Or @Y >= y - 5
     SteerToPoint(x, y)
-    If X >= x - 5 And Y >= y - 5 And Y <= y - 5 Then
+    If @X >= x - 5 And @Y >= y - 5 And @Y <= y - 5 Then
       break
     EndIf
   EndWhile
 EndFunction
 
 Function Reset(in number turnAngle)
-  x1 = X + Math.Cos(Math.GetRadians(gyroAngle)) * fakeWheelBase
-  y1 = Y + Math.Sin(Math.GetRadians(gyroAngle)) * fakeWheelBase
+  x1 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  y1 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   DriveToPointUntilLine(100, 50)
-  x2 = X + Math.Cos(Math.GetRadians(gyroAngle)) * fakeWheelBase
-  y2 = Y + Math.Sin(Math.GetRadians(gyroAngle)) * fakeWheelBase
-  If clockWise = 0 Then
-    AdvGyro.ResetPort2(gyroAngle + turnAngle)
+  x2 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  y2 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  If @clockWise = 0 Then
+    AdvGyro.ResetPort2(@gyroAngle + turnAngle)
   Else
-    AdvGyro.ResetPort2(gyroAngle - turnAngle)
+    AdvGyro.ResetPort2(@gyroAngle - turnAngle)
   EndIf
-  AdvGyro.WritePort2(gyroAngle)
+  AdvGyro.WritePort2(@gyroAngle)
   deltaX = y2 - y1
   deltaY = x1 - x2
   resetX = 0.88 * deltaY - 0.51 * deltaX - 47.13
   resetY = 1.72 * resetX + 133.97
-  resetX = X - 12.3 * Math.Cos(Math.GetRadians(gyroAngle)) * fakeWheelBase
-  resetY = Y - 12.3 * Math.Sin(Math.GetRadians(gyroAngle)) * fakeWheelBase
+  resetX = @X - 12.3 * Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  resetY = @Y - 12.3 * Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   Odometry.Reset(resetX, resetY)
-  turnCounter++
+  @turnCounter++
 EndFunction
 
 Function DriveToPoints()
   For i = 0 To 3
-    DriveToPoint(Row.Read(x_dot, i), Row.Read(y_dot, i))
+    DriveToPoint(Row.Read(@x_dot, i), Row.Read(@y_dot, i))
   EndFor
 EndFunction
 
 Function GyroCore(out number aim)
-  aim = gyroKp * delta + gyroKd * (gyroAngle - gyroOld)
-  gyroOld = gyroAngle
+  aim = @gyroKp * @gyroAngle + @gyroKd * (@gyroAngle - @gyroOld)
+  @gyroOld = @gyroAngle
 EndFunction
 
 Function Start(in number power)
@@ -168,12 +167,19 @@ Thread.Run = UArt
 Thread.Run = Odometry
 Thread.run = Steering
 
+
+While 1=1
+  LCD.Text(1, 10, 10, 2, gyroAngle)
+  LCD.Text(1, 10, 40, 2, X)
+  LCD.Text(1, 10, 70, 2, Y)
+EndWhile
+
 Start(50)
 While turnCounter < 12
   DriveToPoints()
   isWhite = 0
   isOrange = 0
-  While isWhite = 0 Or isOrange != clockWise
+  While isWhite = 0 Or isOrange <> clockWise
     GyroCore(aim)
     SteerControl.SetTarget(aim)
     ColorCheck(isWhite, clockWise)

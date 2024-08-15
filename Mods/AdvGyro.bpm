@@ -10,29 +10,29 @@ number gyro_last
 
 Function WritePort1(out number angle)
   value = Sensor1.Raw1()
-  ToolBox.AngleWrap(value, wrapped_angle)
-  angle = wrapped_angle - gyro_last
+  angle = value - gyro_last
+  ToolBox.AngleWrap(angle, angle)
   gyro_angle = angle
 EndFunction
 
 Function WritePort2(out number angle)
   value = Sensor2.Raw1()
-  ToolBox.AngleWrap(value, wrapped_angle)
-  angle = wrapped_angle - gyro_last
+  unwrapped_angle = value - gyro_last
+  ToolBox.AngleWrap(unwrapped_angle, angle)
   gyro_angle = angle
 EndFunction
 
 Function WritePort3(out number angle)
   value = Sensor3.Raw1()
-  ToolBox.AngleWrap(value, wrapped_angle)
-  angle = wrapped_angle - gyro_last
+  angle = value - gyro_last
+  ToolBox.AngleWrap(angle, angle)
   gyro_angle = angle
 EndFunction
 
 Function WritePort4(out number angle)
   value = Sensor4.Raw1()
-  ToolBox.AngleWrap(value, wrapped_angle)
-  angle = wrapped_angle - gyro_last
+  angle = value - gyro_last
+  ToolBox.AngleWrap(angle, angle)
   gyro_angle = angle
 EndFunction
 
