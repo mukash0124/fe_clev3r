@@ -32,8 +32,8 @@ Function Write(in number angle, in number encChange)
     Y = resYodom
     reset = 0
   Else
-    X = X + encChange / coefficient * Math.Cos(Math.GetRadians(angle))
-    Y = Y + encChange / coefficient * Math.Sin(Math.GetRadians(angle))
+    X = X + (encChange / coefficient) * Math.Cos(Math.GetRadians(angle))
+    Y = Y + (encChange / coefficient) * Math.Sin(Math.GetRadians(angle))
   EndIf
 EndFunction
 

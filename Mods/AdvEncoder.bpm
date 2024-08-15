@@ -13,24 +13,32 @@ Function Config()
   lastB = 0
   lastC = 0
   lastD = 0
+  MotorA.ResetCount()
+  MotorB.ResetCount()
+  MotorC.ResetCount()
+  MotorD.ResetCount()
 EndFunction
 
-Function getChangeA(out number encChange)
-  encChange = MotorA.GetTacho() - lastA
-  lastA = MotorA.GetTacho()
+Function getChangeA(out number change)
+  enc = MotorA.GetTacho()
+  change = enc - lastA
+  lastA = enc
 EndFunction
 
 Function getChangeB(out number change)
-  encChange = MotorB.GetTacho() - lastB
-  lastB = MotorB.GetTacho()
+  enc = MotorB.GetTacho()
+  change = enc - lastB
+  lastB = enc
 EndFunction
 
 Function getChangeC(out number change)
-  encChange = MotorC.GetTacho() - lastC
-  lastC = MotorC.GetTacho()
+  enc = MotorC.GetTacho()
+  change = enc - lastC
+  lastC = enc
 EndFunction
 
 Function getChangeD(out number change)
-  encChange = MotorC.GetTacho() - lastD
-  lastC = MotorC.GetTacho()
+  enc = MotorD.GetTacho()
+  change = enc - lastD
+  lastD = enc
 EndFunction

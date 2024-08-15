@@ -31,6 +31,7 @@ Function Core(in number encoder, out number power)
   pd = kP * error + kD * (error - error_old)
   power = kI * error_sum + pd
   error_sum = error_sum / 1.1 + error
+  error_old = error
 EndFunction
 
 Function SetTarget(in number target)

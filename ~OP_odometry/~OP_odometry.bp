@@ -1,11 +1,15 @@
+pr_advgyro_gyro_last = 0
+pr_advgyro_gyro_angle = 0
 pr_odometry_coefficient = 0
 pr_odometry_x = 0
 pr_odometry_y = 0
 pr_odometry_reset = 0
 pr_odometry_resxodom = 0
 pr_odometry_resyodom = 0
-pr_advgyro_gyro_last = 0
-pr_advgyro_gyro_angle = 0
+pr_advencoder_lasta = 0
+pr_advencoder_lastb = 0
+pr_advencoder_lastc = 0
+pr_advencoder_lastd = 0
 pr_colorrgb_s_red_k = 0
 pr_colorrgb_s_red_b = 0
 pr_colorrgb_s_blue_k = 0
@@ -20,68 +24,65 @@ pr_steercontrol_steer_center = 0
 pr_steercontrol_steer_target = 0
 pr_steercontrol_error_old = 0
 pr_steercontrol_error_sum = 0
-pr_advencoder_lasta = 0
-pr_advencoder_lastc = 0
-lv_coef_9 = 0
-lv_angle_13 = 0
-lv_red_min_16 = 0
-lv_red_max_16 = 0
-lv_blue_min_16 = 0
-lv_blue_max_16 = 0
-lv_green_min_16 = 0
-lv_green_max_16 = 0
-lv_in_kp_18 = 0
-lv_in_ki_18 = 0
-lv_in_kd_18 = 0
-lv_in_limit_18 = 0
-lv_in_steer_center_18 = 0
+lv_port_9 = 0
+lv_result_9 = 0
+lv_port_10 = 0
+lv_coef_14 = 0
+lv_angle_11 = 0
+lv_red_min_20 = 0
+lv_red_max_20 = 0
+lv_blue_min_20 = 0
+lv_blue_max_20 = 0
+lv_green_min_20 = 0
+lv_green_max_20 = 0
+lv_in_kp_22 = 0
+lv_in_ki_22 = 0
+lv_in_kd_22 = 0
+lv_in_limit_22 = 0
+lv_in_steer_center_22 = 0
 lv_power_8 = 0
-lv_aim_7 = 0
-lv_target_21 = 0
+lv_target_25 = 0
 lv_iswhite_1 = 0
 lv_isorange_1 = 0
 lv_turnangle_5 = 0
-lv_angle_14 = 0
-lv_encchange_22 = 0
-lv_change_23 = 0
-lv_red_17 = 0
-lv_blue_17 = 0
-lv_green_17 = 0
-lv_port_24 = 0
-lv_sig_24 = 0
-lv_x_24 = 0
-lv_y_24 = 0
-lv_w_24 = 0
-lv_h_24 = 0
-lv_encoder_19 = 0
-lv_power_19 = 0
-lv_angle_10 = 0
-lv_encchange_10 = 0
-lv_xodom_11 = 0
-lv_yodom_11 = 0
-lv_y_25 = 0
-lv_x_25 = 0
-lv_n_25 = 0
+lv_angle_12 = 0
+lv_red_21 = 0
+lv_blue_21 = 0
+lv_green_21 = 0
+lv_port_26 = 0
+lv_sig_26 = 0
+lv_x_26 = 0
+lv_y_26 = 0
+lv_w_26 = 0
+lv_h_26 = 0
+lv_encoder_23 = 0
+lv_power_23 = 0
+lv_change_19 = 0
+lv_angle_15 = 0
+lv_encchange_15 = 0
+lv_xodom_16 = 0
+lv_yodom_16 = 0
+lv_y_27 = 0
+lv_x_27 = 0
+lv_n_27 = 0
 lv_x_2 = 0
 lv_y_2 = 0
 lv_x_3 = 0
 lv_y_3 = 0
-lv_xodom_12 = 0
-lv_yodom_12 = 0
+lv_xodom_17 = 0
+lv_yodom_17 = 0
 lv_x_4 = 0
 lv_y_4 = 0
-lv_angle_15 = 0
-lv_wrapped_angle_15 = 0
-lv_x_20 = 0
-lv_min_20 = 0
-lv_max_20 = 0
-lv_n_20 = 0
-gv_aim = 0
+lv_angle_13 = 0
+lv_wrapped_angle_13 = 0
+lv_x_24 = 0
+lv_min_24 = 0
+lv_max_24 = 0
+lv_n_24 = 0
+gv_result = 0
 gv_iswhite = 0
-gv_clockwise = 0
+gv_isorange = 0
 gv_gyroangle = 0
-gv_encchangea = 0
-gv_encchangec = 0
 gv_r = 0
 gv_g = 0
 gv_b = 0
@@ -90,24 +91,28 @@ gv_y_pixy = 0
 gv_w_pixy = 0
 gv_h_pixy = 0
 gv_powerc = 0
+gv_encchangea = 0
 gv_x = 0
 gv_y = 0
 lv_heading_2 = 0
 lv_iswhite_3 = 0
 lv_isorange_3 = 0
-lv_aim_8 = 0
 lv_iswhite_8 = 0
 lv_clockwise_8 = 0
-lv_angle_14 = 0
-lv_target_19 = 0
+lv_angle_12 = 0
+lv_target_23 = 0
 gv_x_dot = 0
 gv_y_dot = 0
 gv_gyrokp = 0
 gv_gyrokd = 0
 gv_gyroold = 0
+gv_clockwise = 0
 gv_turncounter = 0
 gv_turndegree = 0
 gv_fakewheelbase = 0
+gv_uartready = 0
+gv_steeringready = 0
+gv_odometryready = 0
 gv_col = 0
 gv_rmin = 0
 gv_rmax = 0
@@ -115,27 +120,40 @@ gv_gmin = 0
 gv_gmax = 0
 gv_bmin = 0
 gv_bmax = 0
-gv_isorange = 0
 Sensor.SetMode ( 2 , 0 )
 Sensor.SetMode ( 3 , 4 )
+lv_port_9 = 2
+m_advgyro_checkreset_2 ()
+gv_result = lv_result_9
+While gv_result = 0
+lv_port_10 = 2
+m_advgyro_hardreset_1 ()
+lv_port_9 = 2
+m_advgyro_checkreset_2 ()
+gv_result = lv_result_9
+EndWhile
 LCD.Clear ()
-lv_coef_9 = 15.43
+lv_coef_14 = 15.43
 m_odometry_config_1 ()
-lv_angle_13 = 0
+lv_angle_11 = 0
 m_advgyro_resetport2_1 ()
-lv_red_min_16 = 10
-lv_red_max_16 = 250
-lv_blue_min_16 = 10
-lv_blue_max_16 = 250
-lv_green_min_16 = 10
-lv_green_max_16 = 250
+m_advencoder_config_0 ()
+lv_red_min_20 = 10
+lv_red_max_20 = 250
+lv_blue_min_20 = 10
+lv_blue_max_20 = 250
+lv_green_min_20 = 10
+lv_green_max_20 = 250
 m_colorrgb_config_6 ()
-lv_in_kp_18 = 0.5
-lv_in_ki_18 = 0
-lv_in_kd_18 = 0
-lv_in_limit_18 = 35
-lv_in_steer_center_18 = 0
+lv_in_kp_22 = 1.5
+lv_in_ki_22 = 0.1
+lv_in_kd_22 = 3
+lv_in_limit_22 = 48
+lv_in_steer_center_22 = 54
 m_steercontrol_config_5 ()
+MotorC.StartPower ( - 80 )
+Program.Delay ( 2000 )
+MotorC.ResetCount ()
 gv_x_dot = Row.Init ( 4 , 1 )
 Row.write ( gv_x_dot , 0 , 0 )
 Row.write ( gv_x_dot , 1 , 0 )
@@ -146,13 +164,16 @@ Row.write ( gv_y_dot , 0 , - 60 )
 Row.write ( gv_y_dot , 1 , - 40 )
 Row.write ( gv_y_dot , 2 , 20 )
 Row.write ( gv_y_dot , 3 , 40 )
-gv_gyrokp = 1.5
-gv_gyrokd = 3
+gv_gyrokp = 2
+gv_gyrokd = 1.5
 gv_gyroold = 0
 gv_clockwise = 0
 gv_turncounter = 0
 gv_turndegree = 90
 gv_fakewheelbase = 14.5
+gv_uartready = 0
+gv_steeringready = 0
+gv_odometryready = 0
 gv_col = EV3File.OpenRead ( "col" )
 gv_rmin = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
 gv_rmax = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
@@ -160,73 +181,82 @@ gv_gmin = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
 gv_gmax = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
 gv_bmin = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
 gv_bmax = EV3File.ConvertToNumber ( EV3File.ReadLine ( gv_col ) )
-lv_red_min_16 = gv_rmin
-lv_red_max_16 = gv_rmax
-lv_blue_min_16 = gv_gmin
-lv_blue_max_16 = gv_gmax
-lv_green_min_16 = gv_bmin
-lv_green_max_16 = gv_bmax
+lv_red_min_20 = gv_rmin
+lv_red_max_20 = gv_rmax
+lv_blue_min_20 = gv_gmin
+lv_blue_max_20 = gv_gmax
+lv_green_min_20 = gv_bmin
+lv_green_max_20 = gv_bmax
 m_colorrgb_config_6 ()
-MotorC.StartPower ( - 80 )
-Program.Delay ( 2000 )
-MotorC.ResetCount ()
-Motor.Move ( "C" , 50 , 76 , "True" )
 Thread.Run = f_uart_0
 Thread.Run = f_odometry_0
-Thread.run = f_steering_0
-While 1 = 1
-LCD.Text ( 1 , 10 , 10 , 2 , gv_gyroangle )
-LCD.Text ( 1 , 10 , 40 , 2 , gv_x )
-LCD.Text ( 1 , 10 , 70 , 2 , gv_y )
+Thread.Run = f_steering_0
+While gv_uartready = 0 Or gv_steeringready = 0 Or gv_odometryready = 0
 EndWhile
 lv_power_8 = 50
 f_start_1 ()
 While gv_turncounter < 12
 f_drivetopoints_0 ()
-gv_iswhite = 0
+gv_iswhite = 1
 gv_isorange = 0
-While gv_iswhite = 0 Or gv_isorange <> gv_clockwise
-f_gyrocore_1 ()
-gv_aim = lv_aim_7
-lv_target_21 = gv_aim
+While gv_iswhite = 1 Or gv_isorange <> gv_clockwise
+lv_target_25 = gv_gyroangle
 m_steercontrol_settarget_1 ()
 f_colorcheck_2 ()
 gv_iswhite = lv_iswhite_1
-gv_clockwise = lv_isorange_1
+gv_isorange = lv_isorange_1
 EndWhile
+Speaker.Tone ( 100 , 3000 , 100 )
 lv_turnangle_5 = 90
 f_reset_1 ()
 EndWhile
+While 1 = 1
+lv_target_25 = gv_gyroangle
+m_steercontrol_settarget_1 ()
+LCD.Text ( 1 , 10 , 10 , 2 , gv_gyroangle )
+Program.Delay ( 1 )
+LCD.Clear ()
+EndWhile
+While 1 = 1
+f_colorcheck_2 ()
+gv_iswhite = lv_iswhite_1
+gv_isorange = lv_isorange_1
+LCD.Text ( 1 , 10 , 10 , 2 , gv_iswhite )
+LCD.Text ( 1 , 10 , 10 , 2 , gv_isorange )
+Program.Delay ( 1 )
+LCD.Clear ()
+EndWhile
 Sub f_uart_0
+gv_uartready = 1
 While 1 = 1
 m_advgyro_writeport2_1 ()
-gv_gyroangle = lv_angle_14
-m_advencoder_getchangea_1 ()
-gv_encchangea = lv_encchange_22
-m_advencoder_getchangec_1 ()
-gv_encchangec = lv_change_23
+gv_gyroangle = lv_angle_12
 m_colorrgb_readport3_3 ()
-gv_r = lv_red_17
-gv_g = lv_blue_17
-gv_b = lv_green_17
+gv_r = lv_red_21
+gv_g = lv_blue_21
+gv_b = lv_green_21
 EndWhile
 EndSub
 Sub f_steering_0
+gv_steeringready = 1
 While 1 = 1
-lv_encoder_19 = gv_encchangec
+lv_encoder_23 = MotorC.GetTacho ()
 m_steercontrol_core_2 ()
-gv_powerc = lv_power_19
+gv_powerc = lv_power_23
 MotorC.StartPower ( gv_powerc )
 EndWhile
 EndSub
 Sub f_odometry_0
+gv_odometryready = 1
 While 1 = 1
-lv_angle_10 = gv_gyroangle
-lv_encchange_10 = gv_encchangea
+m_advencoder_getchangea_1 ()
+gv_encchangea = lv_change_19
+lv_angle_15 = gv_gyroangle
+lv_encchange_15 = gv_encchangea
 m_odometry_write_2 ()
 m_odometry_read_2 ()
-gv_x = lv_xodom_11
-gv_y = lv_yodom_11
+gv_x = lv_xodom_16
+gv_y = lv_yodom_16
 EndWhile
 EndSub
 Sub f_colorcheck_2
@@ -244,12 +274,12 @@ EndSub
 Sub f_steertopoint_2
 lv_deltax_2 = lv_x_2 - gv_x
 lv_deltay_2 = lv_y_2 - gv_y
-lv_y_25 = lv_deltax_2
-lv_x_25 = lv_deltay_2
+lv_y_27 = lv_deltax_2
+lv_x_27 = lv_deltay_2
 m_tool_atan2_3 ()
-lv_heading_2 = lv_n_25
+lv_heading_2 = lv_n_27
 lv_headingdifference_2 = gv_gyroangle - lv_heading_2
-lv_target_21 = lv_headingdifference_2
+lv_target_25 = lv_headingdifference_2
 m_steercontrol_settarget_1 ()
 EndSub
 Sub f_drivetopointuntilline_2
@@ -284,22 +314,22 @@ f_drivetopointuntilline_2 ()
 lv_x2_5 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y2_5 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 If gv_clockwise = 0 Then
-lv_angle_13 = gv_gyroangle + lv_turnangle_5
+lv_angle_11 = gv_gyroangle + lv_turnangle_5
 m_advgyro_resetport2_1 ()
 Else
-lv_angle_13 = gv_gyroangle - lv_turnangle_5
+lv_angle_11 = gv_gyroangle - lv_turnangle_5
 m_advgyro_resetport2_1 ()
 EndIf
 m_advgyro_writeport2_1 ()
-gv_gyroangle = lv_angle_14
+gv_gyroangle = lv_angle_12
 lv_deltax_5 = lv_y2_5 - lv_y1_5
 lv_deltay_5 = lv_x1_5 - lv_x2_5
 lv_resetx_5 = 0.88 * lv_deltay_5 - 0.51 * lv_deltax_5 - 47.13
 lv_resety_5 = 1.72 * lv_resetx_5 + 133.97
 lv_resetx_5 = gv_x - 12.3 * Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_resety_5 = gv_y - 12.3 * Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
-lv_xodom_12 = lv_resetx_5
-lv_yodom_12 = lv_resety_5
+lv_xodom_17 = lv_resetx_5
+lv_yodom_17 = lv_resety_5
 m_odometry_reset_2 ()
 gv_turncounter = gv_turncounter + 1
 EndSub
@@ -310,27 +340,63 @@ lv_y_4 = Row.Read ( gv_y_dot , lv_i_6 )
 f_drivetopoint_2 ()
 EndFor
 EndSub
-Sub f_gyrocore_1
-lv_aim_7 = gv_gyrokp * gv_gyroangle + gv_gyrokd * ( gv_gyroangle - gv_gyroold )
-gv_gyroold = gv_gyroangle
-EndSub
 Sub f_start_1
-lv_iswhite_8 = 0
+lv_iswhite_8 = 1
 MotorAB.StartPower ( lv_power_8 )
-While lv_iswhite_8 = 0
-f_gyrocore_1 ()
-lv_aim_8 = lv_aim_7
-lv_target_21 = lv_aim_8
+While lv_iswhite_8 = 1
+lv_target_25 = gv_gyroangle
 m_steercontrol_settarget_1 ()
 f_colorcheck_2 ()
 lv_iswhite_8 = lv_iswhite_1
 lv_clockwise_8 = lv_isorange_1
 EndWhile
+Speaker.Tone ( 100 , 3000 , 100 )
 lv_turnangle_5 = 90
 f_reset_1 ()
 EndSub
+Sub m_advgyro_checkreset_2
+Sensor.SetMode ( lv_port_9 , 0 )
+Sensor.ReadRawValue ( lv_port_9 , 0 )
+Program.Delay ( 600 )
+If Sensor.ReadRawValue ( lv_port_9 , 0 ) <> 0 Then
+lv_result_9 = 0
+Speaker.Note ( 100 , "C5" , 100 )
+Speaker.Wait ()
+Speaker.Note ( 100 , "C5" , 100 )
+Speaker.Wait ()
+Speaker.Note ( 100 , "C5" , 100 )
+Speaker.Wait ()
+Else
+lv_result_9 = 1
+EndIf
+EndSub
+Sub m_advgyro_hardreset_1
+Sensor.SetMode ( lv_port_10 , 4 )
+Program.Delay ( 550 )
+Sensor.SetMode ( lv_port_10 , 0 )
+EndSub
+Sub m_advgyro_resetport2_1
+lv_value_11 = Sensor2.Raw1 ()
+pr_advgyro_gyro_last = lv_value_11 - lv_angle_11
+EndSub
+Sub m_advgyro_writeport2_1
+lv_value_12 = Sensor2.Raw1 ()
+lv_unwrapped_angle_12 = lv_value_12 - pr_advgyro_gyro_last
+lv_angle_13 = lv_unwrapped_angle_12
+m_toolbox_anglewrap_2 ()
+lv_angle_12 = lv_wrapped_angle_13
+pr_advgyro_gyro_angle = lv_angle_12
+EndSub
+Sub m_toolbox_anglewrap_2
+If lv_angle_13 < 0 Then
+lv_a_13 = - 180
+Else
+lv_a_13 = 180
+EndIf
+lv_wrapped_angle_13 = Math.Remainder ( ( lv_angle_13 + lv_a_13 ) , 360 ) - lv_a_13
+EndSub
 Sub m_odometry_config_1
-pr_odometry_coefficient = lv_coef_9
+pr_odometry_coefficient = lv_coef_14
 pr_odometry_x = 0
 pr_odometry_y = 0
 pr_odometry_reset = 0
@@ -343,121 +409,109 @@ pr_odometry_x = pr_odometry_resxodom
 pr_odometry_y = pr_odometry_resyodom
 pr_odometry_reset = 0
 Else
-pr_odometry_x = pr_odometry_x + lv_encchange_10 / pr_odometry_coefficient * Math.Cos ( Math.GetRadians ( lv_angle_10 ) )
-pr_odometry_y = pr_odometry_y + lv_encchange_10 / pr_odometry_coefficient * Math.Sin ( Math.GetRadians ( lv_angle_10 ) )
+pr_odometry_x = pr_odometry_x + ( lv_encchange_15 / pr_odometry_coefficient ) * Math.Cos ( Math.GetRadians ( lv_angle_15 ) )
+pr_odometry_y = pr_odometry_y + ( lv_encchange_15 / pr_odometry_coefficient ) * Math.Sin ( Math.GetRadians ( lv_angle_15 ) )
 EndIf
 EndSub
 Sub m_odometry_read_2
-lv_xodom_11 = pr_odometry_x
-lv_yodom_11 = pr_odometry_y
+lv_xodom_16 = pr_odometry_x
+lv_yodom_16 = pr_odometry_y
 EndSub
 Sub m_odometry_reset_2
-pr_odometry_resxodom = lv_xodom_12
-pr_odometry_resyodom = lv_yodom_12
+pr_odometry_resxodom = lv_xodom_17
+pr_odometry_resyodom = lv_yodom_17
 pr_odometry_reset = 1
 EndSub
-Sub m_advgyro_resetport2_1
-lv_value_13 = Sensor2.Raw1 ()
-pr_advgyro_gyro_last = lv_value_13 - lv_angle_13
+Sub m_advencoder_config_0
+pr_advencoder_lasta = 0
+pr_advencoder_lastb = 0
+pr_advencoder_lastc = 0
+pr_advencoder_lastd = 0
+MotorA.ResetCount ()
+MotorB.ResetCount ()
+MotorC.ResetCount ()
+MotorD.ResetCount ()
 EndSub
-Sub m_advgyro_writeport2_1
-lv_value_14 = Sensor2.Raw1 ()
-lv_angle_14 = lv_value_14 - pr_advgyro_gyro_last
-lv_angle_15 = lv_angle_14
-m_toolbox_anglewrap_2 ()
-lv_angle_14 = lv_wrapped_angle_15
-pr_advgyro_gyro_angle = lv_angle_14
-EndSub
-Sub m_toolbox_anglewrap_2
-If lv_angle_15 < 0 Then
-lv_a_15 = - 180
-Else
-lv_a_15 = 180
-EndIf
-lv_wrapped_angle_15 = Math.Remainder ( ( lv_angle_15 + lv_a_15 ) , 360 ) - lv_a_15
+Sub m_advencoder_getchangea_1
+lv_enc_19 = MotorA.GetTacho ()
+lv_change_19 = lv_enc_19 - pr_advencoder_lasta
+pr_advencoder_lasta = lv_enc_19
 EndSub
 Sub m_colorrgb_config_6
-pr_colorrgb_s_red_k = 100 / ( lv_red_max_16 - lv_red_min_16 )
-pr_colorrgb_s_red_b = lv_red_min_16 * ( - 1 ) * pr_colorrgb_s_red_k
-pr_colorrgb_s_blue_k = 100 / ( lv_blue_max_16 - lv_blue_min_16 )
-pr_colorrgb_s_blue_b = lv_blue_min_16 * ( - 1 ) * pr_colorrgb_s_blue_k
-pr_colorrgb_s_green_k = 100 / ( lv_green_max_16 - lv_green_min_16 )
-pr_colorrgb_s_green_b = lv_green_min_16 * ( - 1 ) * pr_colorrgb_s_green_k
+pr_colorrgb_s_red_k = 100 / ( lv_red_max_20 - lv_red_min_20 )
+pr_colorrgb_s_red_b = lv_red_min_20 * ( - 1 ) * pr_colorrgb_s_red_k
+pr_colorrgb_s_blue_k = 100 / ( lv_blue_max_20 - lv_blue_min_20 )
+pr_colorrgb_s_blue_b = lv_blue_min_20 * ( - 1 ) * pr_colorrgb_s_blue_k
+pr_colorrgb_s_green_k = 100 / ( lv_green_max_20 - lv_green_min_20 )
+pr_colorrgb_s_green_b = lv_green_min_20 * ( - 1 ) * pr_colorrgb_s_green_k
 EndSub
 Sub m_colorrgb_readport3_3
-lv_r_17 = 0
-lv_g_17 = 0
-lv_b_17 = 0
-Sensor3.Raw3 ( lv_r_17 , lv_g_17 , lv_b_17 )
-lv_red_17 = lv_r_17 * pr_colorrgb_s_red_k + pr_colorrgb_s_red_b
-lv_blue_17 = lv_b_17 * pr_colorrgb_s_blue_k + pr_colorrgb_s_blue_b
-lv_green_17 = lv_g_17 * pr_colorrgb_s_green_k + pr_colorrgb_s_green_b
+lv_r_21 = 0
+lv_g_21 = 0
+lv_b_21 = 0
+Sensor3.Raw3 ( lv_r_21 , lv_g_21 , lv_b_21 )
+lv_red_21 = lv_r_21 * pr_colorrgb_s_red_k + pr_colorrgb_s_red_b
+lv_blue_21 = lv_b_21 * pr_colorrgb_s_blue_k + pr_colorrgb_s_blue_b
+lv_green_21 = lv_g_21 * pr_colorrgb_s_green_k + pr_colorrgb_s_green_b
 EndSub
 Sub m_steercontrol_config_5
-pr_steercontrol_kp = lv_in_kp_18
-pr_steercontrol_ki = lv_in_ki_18
-pr_steercontrol_kd = lv_in_kd_18
-pr_steercontrol_limit = lv_in_limit_18
-pr_steercontrol_steer_center = lv_in_steer_center_18
+pr_steercontrol_kp = lv_in_kp_22
+pr_steercontrol_ki = lv_in_ki_22
+pr_steercontrol_kd = lv_in_kd_22
+pr_steercontrol_limit = lv_in_limit_22
+pr_steercontrol_steer_center = lv_in_steer_center_22
 pr_steercontrol_steer_target = 0
 pr_steercontrol_error_old = 0
 pr_steercontrol_error_sum = 0
 EndSub
 Sub m_steercontrol_core_2
-lv_x_20 = pr_steercontrol_steer_target
-lv_min_20 = 0 - pr_steercontrol_limit
-lv_max_20 = pr_steercontrol_limit
+lv_x_24 = pr_steercontrol_steer_target
+lv_min_24 = 0 - pr_steercontrol_limit
+lv_max_24 = pr_steercontrol_limit
 m_tool_constrain_4 ()
-lv_target_19 = lv_n_20
-lv_error_19 = pr_steercontrol_steer_center + lv_target_19 - lv_encoder_19
-lv_pd_19 = pr_steercontrol_kp * lv_error_19 + pr_steercontrol_kd * ( lv_error_19 - pr_steercontrol_error_old )
-lv_power_19 = pr_steercontrol_ki * pr_steercontrol_error_sum + lv_pd_19
-pr_steercontrol_error_sum = pr_steercontrol_error_sum / 1.1 + lv_error_19
+lv_target_23 = lv_n_24
+lv_error_23 = pr_steercontrol_steer_center + lv_target_23 - lv_encoder_23
+lv_pd_23 = pr_steercontrol_kp * lv_error_23 + pr_steercontrol_kd * ( lv_error_23 - pr_steercontrol_error_old )
+lv_power_23 = pr_steercontrol_ki * pr_steercontrol_error_sum + lv_pd_23
+pr_steercontrol_error_sum = pr_steercontrol_error_sum / 1.1 + lv_error_23
+pr_steercontrol_error_old = lv_error_23
 EndSub
 Sub m_tool_constrain_4
-If lv_x_20 < lv_min_20 Then
-lv_n_20 = lv_min_20
-ElseIf lv_x_20 > lv_max_20 Then
-lv_n_20 = lv_max_20
+If lv_x_24 < lv_min_24 Then
+lv_n_24 = lv_min_24
+ElseIf lv_x_24 > lv_max_24 Then
+lv_n_24 = lv_max_24
 Else
-lv_n_20 = lv_x_20
+lv_n_24 = lv_x_24
 EndIf
 EndSub
 Sub m_steercontrol_settarget_1
-pr_steercontrol_steer_target = lv_target_21
-EndSub
-Sub m_advencoder_getchangea_1
-lv_encchange_22 = MotorA.GetTacho () - pr_advencoder_lasta
-pr_advencoder_lasta = MotorA.GetTacho ()
-EndSub
-Sub m_advencoder_getchangec_1
-lv_encchange_23 = MotorC.GetTacho () - pr_advencoder_lastc
-pr_advencoder_lastc = MotorC.GetTacho ()
+pr_steercontrol_steer_target = lv_target_25
 EndSub
 Sub m_pixy2_getsignature_6
-lv_address_24 = 80 + lv_sig_24
-lv_values_24 = Sensor.ReadI2CRegisters ( lv_port_24 , 1 , lv_address_24 , 5 )
-lv_x_24 = lv_values_24 [ 1 ]
-lv_y_24 = lv_values_24 [ 2 ]
-lv_w_24 = lv_values_24 [ 3 ]
-lv_h_24 = lv_values_24 [ 4 ]
+lv_address_26 = 80 + lv_sig_26
+lv_values_26 = Sensor.ReadI2CRegisters ( lv_port_26 , 1 , lv_address_26 , 5 )
+lv_x_26 = lv_values_26 [ 1 ]
+lv_y_26 = lv_values_26 [ 2 ]
+lv_w_26 = lv_values_26 [ 3 ]
+lv_h_26 = lv_values_26 [ 4 ]
 EndSub
 Sub m_tool_atan2_3
-If lv_x_25 > 0 Then
-lv_n_25 = Math.GetDegrees ( Math.ArcTan ( lv_y_25 / lv_x_25 ) )
-ElseIf lv_x_25 < 0 Then
-If lv_y_25 >= 0 Then
-lv_n_25 = Math.GetDegrees ( Math.ArcTan ( lv_y_25 / lv_x_25 ) ) + 180
+If lv_x_27 > 0 Then
+lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) )
+ElseIf lv_x_27 < 0 Then
+If lv_y_27 >= 0 Then
+lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) ) + 180
 Else
-lv_n_25 = Math.GetDegrees ( Math.ArcTan ( lv_y_25 / lv_x_25 ) ) - 180
+lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) ) - 180
 EndIf
-ElseIf lv_x_25 = 0 Then
-If lv_y_25 = 0 Then
-lv_n_25 = 0
-ElseIf lv_y_25 > 0 Then
-lv_n_25 = 90
-ElseIf lv_y_25 < 0 Then
-lv_n_25 = - 90
+ElseIf lv_x_27 = 0 Then
+If lv_y_27 = 0 Then
+lv_n_27 = 0
+ElseIf lv_y_27 > 0 Then
+lv_n_27 = 90
+ElseIf lv_y_27 < 0 Then
+lv_n_27 = - 90
 EndIf
 EndIf
 EndSub

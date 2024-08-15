@@ -7,7 +7,10 @@ AdvGyro.ResetPort2(0)
 LCD.Clear()
 While 1=1
   AdvGyro.WritePort2(angle)
+  enc = MotorA.GetTacho()
   ToolBox.AngleWrap(100, wrapped_angle)
   LCD.Text(1, 10, 10, 2, angle)
-  LCD.Text(1, 10, 50, 2, wrapped_angle)
+  LCD.Text(1, 10, 50, 2, enc)
+  Program.Delay(500)
+  LCD.Clear()
 EndWhile

@@ -1,5 +1,4 @@
 import "Mods\Odometry"
-import "Mods\Gyro"
 import "Mods\AdvEncoder"
 import "Mods\AdvGyro"
 import "Mods\ColorRGB"
@@ -10,11 +9,21 @@ import "Mods\Tool"
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 
+AdvGyro.CheckReset(2, result)
+While result = 0
+  AdvGyro.HardReset(2)
+  AdvGyro.CheckReset(2, result)
+EndWhile
+
 LCD.Clear()
 Odometry.Config(15.43)
 AdvGyro.ResetPort2(0)
+AdvEncoder.Config()
 ColorRGB.Config(10, 250, 10, 250, 10, 250)
-SteerControl.Config(0.5, 0, 0, 35, 0)
+SteerControl.Config(1.5, 0.1, 3, 48, 54)
+MotorC.StartPower(-80)
+Program.Delay(2000)
+MotorC.ResetCount()
 
 x_dot = Row.Init(4, 1)
 Row.write(x_dot, 0, 0)
@@ -28,13 +37,16 @@ Row.write(y_dot, 1, -40)
 Row.write(y_dot, 2, 20)
 Row.write(y_dot, 3, 40)
 
-gyroKp = 1.5
-gyroKd = 3
+gyroKp = 2
+gyroKd = 1.5
 gyroOld = 0
 clockWise = 0
 turnCounter = 0
 turnDegree = 90
 fakeWheelBase = 14.5
+UArtReady = 0
+SteeringReady = 0
+OdometryReady = 0
 
 col = EV3File.OpenRead("col")
 Rmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
@@ -45,35 +57,33 @@ Bmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 Bmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 ColorRGB.Config(Rmin, Rmax, Gmin, Gmax, Bmin, Bmax)
 
-MotorC.StartPower(-80)
-Program.Delay(2000)
-MotorC.ResetCount()
-Motor.Move("C", 50, 76, "True")
-
 Sub UArt
+  UArtReady = 1
   While 1=1
     AdvGyro.WritePort2(gyroAngle)
-    AdvEncoder.getChangeA(encChangeA)
-    AdvEncoder.getChangeC(encChangeC)
     ColorRGB.ReadPort3(r, g, b)
   EndWhile
 EndSub
 
 Sub I2C
+  I2CReady = 1
   While 1=1
     Pixy2.getSignature(1, 1, x_pixy, y_pixy, w_pixy, h_pixy)
   EndWhile
 EndSub
 
 Sub Steering
+  SteeringReady = 1
   While 1=1
-    SteerControl.Core(encChangeC, powerC)
+    SteerControl.Core(MotorC.GetTacho(), powerC)
     MotorC.StartPower(powerC)
   EndWhile
 EndSub
 
 Sub Odometry
+  OdometryReady = 1
   While 1=1
+    AdvEncoder.getChangeA(encChangeA)
     Odometry.Write(gyroAngle, encChangeA)
     Odometry.Read(X, Y)
   EndWhile
@@ -146,43 +156,59 @@ Function DriveToPoints()
   EndFor
 EndFunction
 
-Function GyroCore(out number aim)
-  aim = @gyroKp * @gyroAngle + @gyroKd * (@gyroAngle - @gyroOld)
-  @gyroOld = @gyroAngle
+Function GyroCore(in number angle, out number aim)
+  aim = @gyroKp * angle + @gyroKd * (angle - @gyroOld)
+  @gyroOld = angle
 EndFunction
 
 Function Start(in number power)
-  isWhite = 0
+  isWhite = 1
   MotorAB.StartPower(power)
-  While isWhite = 0
-    GyroCore(aim)
-    SteerControl.SetTarget(aim)
+  While isWhite = 1
+    SteerControl.SetTarget(@gyroAngle)
     ColorCheck(isWhite, clockWise)
   EndWhile
+  Speaker.Tone(100, 3000, 100)
   Reset(90)
 EndFunction
 
 Thread.Run = UArt
 'Thread.Run = I2C
 Thread.Run = Odometry
-Thread.run = Steering
+Thread.Run = Steering
 
-
-While 1=1
-  LCD.Text(1, 10, 10, 2, gyroAngle)
-  LCD.Text(1, 10, 40, 2, X)
-  LCD.Text(1, 10, 70, 2, Y)
+While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
+  
 EndWhile
 
 Start(50)
 While turnCounter < 12
   DriveToPoints()
-  isWhite = 0
+  isWhite = 1
   isOrange = 0
-  While isWhite = 0 Or isOrange <> clockWise
-    GyroCore(aim)
-    SteerControl.SetTarget(aim)
-    ColorCheck(isWhite, clockWise)
+  While isWhite = 1 Or isOrange <> clockWise
+    SteerControl.SetTarget(gyroAngle)
+    ColorCheck(isWhite, isOrange)
   EndWhile
+  Speaker.Tone(100, 3000, 100)
   Reset(90)
 EndWhile
+
+
+
+While 1=1 
+  SteerControl.SetTarget(gyroAngle)
+  LCD.Text(1, 10, 10, 2, gyroAngle)
+  Program.Delay(1)
+  LCD.Clear()
+EndWhile
+
+While 1=1 
+  ColorCheck(isWhite, isOrange)
+  LCD.Text(1, 10, 10, 2, isWhite)
+  LCD.Text(1, 10, 10, 2, isOrange)
+  Program.Delay(1)
+  LCD.Clear()
+EndWhile
+
+
