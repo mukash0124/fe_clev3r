@@ -5,6 +5,7 @@ import "Mods\ColorRGB"
 import "Mods\SteerControl"
 import "Mods\Pixy2"
 import "Mods\Tool"
+import "Mods\ToolBox"
 
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
@@ -25,24 +26,21 @@ MotorC.StartPower(-80)
 Program.Delay(2000)
 MotorC.ResetCount()
 
-x_dot = Row.Init(4, 1)
-Row.write(x_dot, 0, 0)
-Row.write(x_dot, 1, 0)
-Row.write(x_dot, 2, 0)
-Row.write(x_dot, 3, 0)
+x_dot = Row.Init(2, 1)
+Row.write(x_dot, 0, -40)
+Row.write(x_dot, 1, 40)
 
-y_dot = Row.Init(4, 1)
-Row.write(y_dot, 0, -60)
-Row.write(y_dot, 1, -40)
-Row.write(y_dot, 2, 20)
-Row.write(y_dot, 3, 40)
+y_dot = Row.Init(2, 1)
+Row.write(y_dot, 0, 0)
+Row.write(y_dot, 1, 0)
 
-gyroKp = 2
-gyroKd = 1.5
-gyroOld = 0
+
+angleKp = 2
+angleKd = 3
+angleOld = 0
 clockWise = 0
 turnCounter = 0
-turnDegree = 90
+turnAngle = 89.5
 fakeWheelBase = 14.5
 UArtReady = 0
 SteeringReady = 0
@@ -102,11 +100,17 @@ Function ColorCheck(out number isWhite, out number isOrange)
   EndIf
 EndFunction
 
+Function AngleCore(in number angle, out number aim)
+  aim = @angleKp * angle + @angleKd * (angle - @angleOld)
+  @angleOld = angle
+EndFunction
+
 Function SteerToPoint(in number x, in number y)
   deltaX = x - @X
   deltaY = y - @Y
-  Tool.atan2(deltaX, deltaY, heading)
-  headingDifference = @gyroAngle - heading
+  Tool.atan2(deltaY, deltaX, heading)
+  ToolBox.AngleWrap(@gyroAngle - heading, error)
+  AngleCore(error, headingDifference)
   SteerControl.SetTarget(headingDifference)
 EndFunction
 
@@ -117,18 +121,19 @@ Function DriveToPointUntilLine(in number x, in number y)
     SteerToPoint(x, y)
     ColorCheck(isWhite, isOrange)
   EndWhile
+  Speaker.Tone(100, 300, 100)
 EndFunction
 
 Function DriveToPoint(in number x, in number y)
-  While @X <= x - 5 Or @Y <= y - 5 Or @Y >= y - 5
+  While @X <= x - 5 Or @Y <= y - 5 Or @Y >= y + 5
     SteerToPoint(x, y)
-    If @X >= x - 5 And @Y >= y - 5 And @Y <= y - 5 Then
-      break
-    EndIf
   EndWhile
+  Speaker.Tone(100, 300, 100)
 EndFunction
 
 Function Reset(in number turnAngle)
+  b1 = 80.5
+  b2 = 136
   x1 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   y1 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   DriveToPointUntilLine(100, 50)
@@ -142,40 +147,48 @@ Function Reset(in number turnAngle)
   AdvGyro.WritePort2(@gyroAngle)
   deltaX = y2 - y1
   deltaY = x1 - x2
-  resetX = 0.88 * deltaY - 0.51 * deltaX - 47.13
-  resetY = 1.72 * resetX + 133.97
-  resetX = @X - 12.3 * Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
-  resetY = @Y - 12.3 * Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
+  resetY = 1.73 * resetX + b2
+  resetX = resetX - Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
+  resetY = resetY - Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   Odometry.Reset(resetX, resetY)
   @turnCounter++
 EndFunction
 
 Function DriveToPoints()
-  For i = 0 To 3
+  For i = 0 To 1
     DriveToPoint(Row.Read(@x_dot, i), Row.Read(@y_dot, i))
   EndFor
 EndFunction
 
-Function GyroCore(in number angle, out number aim)
-  aim = @gyroKp * angle + @gyroKd * (angle - @gyroOld)
-  @gyroOld = angle
-EndFunction
-
 Function Start(in number power)
   isWhite = 1
+  isOrange = 0
   MotorAB.StartPower(power)
   While isWhite = 1
     SteerControl.SetTarget(@gyroAngle)
-    ColorCheck(isWhite, clockWise)
+    ColorCheck(isWhite, isOrange)
   EndWhile
+  @clockwise = isOrange
   Speaker.Tone(100, 3000, 100)
-  Reset(90)
+  Reset(@turnAngle)
 EndFunction
 
 Thread.Run = UArt
 'Thread.Run = I2C
 Thread.Run = Odometry
 Thread.Run = Steering
+
+Sub Display
+  While 1=1 
+    LCD.Text(1, 10, 10, 2, X)
+    LCD.Text(1, 10, 40, 2, Y)
+    Program.Delay(1)
+    LCD.Clear()
+  EndWhile
+EndSub
+
+Thread.Run = Display
 
 While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
   
@@ -191,16 +204,11 @@ While turnCounter < 12
     ColorCheck(isWhite, isOrange)
   EndWhile
   Speaker.Tone(100, 3000, 100)
-  Reset(90)
+  Reset(turnAngle)
 EndWhile
 
-
-
 While 1=1 
-  SteerControl.SetTarget(gyroAngle)
-  LCD.Text(1, 10, 10, 2, gyroAngle)
-  Program.Delay(1)
-  LCD.Clear()
+  SteerToPoint(100, 50)
 EndWhile
 
 While 1=1 
