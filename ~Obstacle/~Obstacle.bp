@@ -69,8 +69,6 @@ lv_wrapped_angle_28 = 0
 lv_angle_2 = 0
 lv_aim_2 = 0
 lv_target_25 = 0
-lv_x_4 = 0
-lv_y_4 = 0
 lv_xodom_19 = 0
 lv_yodom_19 = 0
 lv_x_5 = 0
@@ -98,12 +96,12 @@ lv_error_3 = 0
 lv_headingdifference_3 = 0
 lv_iswhite_4 = 0
 lv_isorange_4 = 0
+lv_iswhite_6 = 0
+lv_isorange_6 = 0
 lv_iswhite_9 = 0
 lv_isorange_9 = 0
 lv_angle_13 = 0
 lv_target_23 = 0
-gv_x_dot = 0
-gv_y_dot = 0
 gv_col = 0
 gv_rmin = 0
 gv_rmax = 0
@@ -124,12 +122,6 @@ gv_odometryready = 0
 gv_i2cready = 0
 Sensor.SetMode ( 2 , 0 )
 Sensor.SetMode ( 3 , 4 )
-gv_x_dot = Row.Init ( 2 , 1 )
-Row.write ( gv_x_dot , 0 , - 40 )
-Row.write ( gv_x_dot , 1 , 40 )
-gv_y_dot = Row.Init ( 2 , 1 )
-Row.write ( gv_y_dot , 0 , 0 )
-Row.write ( gv_y_dot , 1 , 0 )
 lv_port_10 = 2
 m_advgyro_checkreset_2 ()
 gv_result = lv_result_10
@@ -173,7 +165,7 @@ gv_anglekd = 3
 gv_angleold = 0
 gv_clockwise = 0
 gv_turncounter = 0
-gv_turnangle = 90
+gv_turnangle = 90.6
 gv_fakewheelbase = 14.5
 gv_uartready = 0
 gv_steeringready = 0
@@ -190,9 +182,9 @@ f_start_1 ()
 While gv_turncounter < 12
 gv_iswhite = 1
 gv_isorange = 0
-While gv_iswhite = 1
-If gv_signature = 0 Then
-lv_x_3 = gv_x + 20
+While gv_iswhite = 1 Or Time.Get1 () < 500
+If gv_signature = 0 Or gv_y > 25 Then
+lv_x_3 = gv_x + 15
 lv_y_3 = 0
 f_steertopoint_2 ()
 Else
@@ -202,8 +194,10 @@ f_colorcheck_2 ()
 gv_iswhite = lv_iswhite_1
 gv_isorange = lv_isorange_1
 EndWhile
+Speaker.Tone ( 100 , 3000 , 100 )
 lv_turnangle_6 = gv_turnangle
 f_reset_1 ()
+Time.Reset1 ()
 EndWhile
 Sub f_uart_0
 gv_uartready = 1
@@ -280,19 +274,6 @@ lv_headingdifference_3 = lv_aim_2
 lv_target_25 = lv_headingdifference_3
 m_steercontrol_settarget_1 ()
 EndSub
-Sub f_drivetopointuntilline_2
-lv_iswhite_4 = 1
-lv_isorange_4 = gv_clockwise
-While lv_iswhite_4 = 1 Or lv_isorange_4 = gv_clockwise
-lv_x_3 = lv_x_4
-lv_y_3 = lv_y_4
-f_steertopoint_2 ()
-f_colorcheck_2 ()
-lv_iswhite_4 = lv_iswhite_1
-lv_isorange_4 = lv_isorange_1
-EndWhile
-Speaker.Tone ( 100 , 300 , 100 )
-EndSub
 Sub f_drivetopoint_2
 While gv_x <= lv_x_5 - 5 Or gv_y <= lv_y_5 - 5 Or gv_y >= lv_y_5 + 5
 lv_x_3 = lv_x_5
@@ -306,9 +287,20 @@ lv_b1_6 = 80.5
 lv_b2_6 = 136
 lv_x1_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y1_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
-lv_x_4 = 100
-lv_y_4 = 50
-f_drivetopointuntilline_2 ()
+lv_iswhite_6 = 1
+lv_isorange_6 = gv_clockwise
+While lv_iswhite_6 = 1 Or lv_isorange_6 = gv_clockwise
+If gv_signature = 0 Then
+lv_x_3 = 100
+lv_y_3 = 50
+f_steertopoint_2 ()
+Else
+f_detourobstacle_0 ()
+EndIf
+f_colorcheck_2 ()
+lv_iswhite_6 = lv_iswhite_1
+lv_isorange_6 = lv_isorange_1
+EndWhile
 lv_x2_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y2_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 If gv_clockwise = 0 Then
@@ -334,10 +326,10 @@ EndSub
 Sub f_detourobstacle_0
 If gv_signature = 1 Then
 Speaker.Tone ( 100 , 4000 , 50 )
-lv_desiredx_8 = 40 * Math.Power ( gv_pixyy , 0.22 )
+lv_desiredx_8 = - 40 * Math.Power ( gv_pixyy , 0.22 )
 Else
 Speaker.Tone ( 100 , 500 , 50 )
-lv_desiredx_8 = - 40 * Math.Power ( gv_pixyy , 0.22 )
+lv_desiredx_8 = 40 * Math.Power ( gv_pixyy , 0.22 )
 EndIf
 lv_target_25 = ( lv_desiredx_8 - gv_pixyx ) * 0.5
 m_steercontrol_settarget_1 ()
@@ -346,8 +338,8 @@ Sub f_start_1
 lv_iswhite_9 = 1
 lv_isorange_9 = 0
 MotorAB.StartPower ( lv_power_9 )
-While lv_iswhite_9 = 1
-If gv_signature = 0 Then
+While lv_iswhite_9 = 1 Or Time.Get1 () < 500
+If gv_signature = 0 Or gv_y > 25 Then
 lv_target_25 = gv_gyroangle
 m_steercontrol_settarget_1 ()
 Else
@@ -361,6 +353,7 @@ gv_clockwise = lv_isorange_9
 Speaker.Tone ( 100 , 3000 , 100 )
 lv_turnangle_6 = gv_turnangle
 f_reset_1 ()
+Time.Reset1 ()
 EndSub
 Sub m_advgyro_checkreset_2
 Sensor.SetMode ( lv_port_10 , 0 )

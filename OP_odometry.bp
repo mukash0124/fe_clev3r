@@ -196,10 +196,8 @@ EndWhile
 
 
 Start(50)
-
-While 1=1 
-  SteerToPoint(@X + 20, 0)
-EndWhile
+MotorAB.OffAndBrake()
+Program.Delay(100000000)
 
 While turnCounter < 12
   DriveToPoints()

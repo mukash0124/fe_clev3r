@@ -10,14 +10,6 @@ import "Mods\ToolBox"
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 
-x_dot = Row.Init(2, 1)
-Row.write(x_dot, 0, -40)
-Row.write(x_dot, 1, 40)
-
-y_dot = Row.Init(2, 1)
-Row.write(y_dot, 0, 0)
-Row.write(y_dot, 1, 0)
-
 AdvGyro.CheckReset(2, result)
 While result = 0
   AdvGyro.HardReset(2)
@@ -46,7 +38,7 @@ angleKd = 3
 angleOld = 0
 clockWise = 0
 turnCounter = 0
-turnAngle = 90
+turnAngle = 90.6
 fakeWheelBase = 14.5
 UArtReady = 0
 SteeringReady = 0
@@ -134,7 +126,16 @@ Function Reset(in number turnAngle)
   b2 = 136
   x1 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   y1 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
-  DriveToPointUntilLine(100, 50)
+  isWhite = 1
+  isOrange = @clockWise
+  While isWhite = 1 Or isOrange = @clockWise
+    If @signature = 0 Then
+      SteerToPoint(100, 50)
+    Else
+      DetourObstacle()
+    EndIf
+    ColorCheck(isWhite, isOrange)
+  EndWhile
   x2 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   y2 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   If @clockWise = 0 Then
@@ -162,10 +163,10 @@ EndFunction
 Function DetourObstacle()
   If @signature = 1 Then
     Speaker.Tone(100, 4000, 50)
-    desiredX = 40 * Math.Power(@pixyY, 0.22)
+    desiredX = -40 * Math.Power(@pixyY, 0.22)
   Else
     Speaker.Tone(100, 500, 50)
-    desiredX = -40 * Math.Power(@pixyY, 0.22)
+    desiredX = 40 * Math.Power(@pixyY, 0.22)
   EndIf
   SteerControl.SetTarget((desiredX - @pixyX) * 0.5)
 EndFunction
@@ -188,8 +189,8 @@ Function Start(in number power)
   isWhite = 1
   isOrange = 0
   MotorAB.StartPower(power)
-  While isWhite = 1
-    If @signature = 0 Then
+  While isWhite = 1 Or Time.Get1() < 500
+    If @signature = 0 Or @Y > 25 Then
       SteerControl.SetTarget(@gyroAngle)
     Else
       DetourObstacle()
@@ -199,6 +200,7 @@ Function Start(in number power)
   @clockwise = isOrange
   Speaker.Tone(100, 3000, 100)
   Reset(@turnAngle)
+  Time.Reset1()
 EndFunction
 
 While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0 Or I2CReady = 0
@@ -209,15 +211,17 @@ Start(50)
 While turnCounter < 12
   isWhite = 1
   isOrange = 0
-  While isWhite = 1
-    If @signature = 0 Then
-      SteerToPoint(@X + 20, 0)
+  While isWhite = 1 Or Time.Get1() < 500
+    If @signature = 0 Or @Y > 25 Then
+      SteerToPoint(@X + 15, 0)
     Else
       DetourObstacle()
     EndIf
     ColorCheck(isWhite, isOrange)
   EndWhile
+  Speaker.Tone(100, 3000, 100)
   Reset(turnAngle)
+  Time.Reset1()
 EndWhile
 
 

@@ -58,6 +58,16 @@ DATA32 timeMC6tmp
 DATA32 timeMC7tmp
 DATA32 timeMC8tmp
 DATA32 timeMC9tmp
+DATAF VLV_PORT_1
+DATAF VLV_X_1
+DATAF VLV_Y_1
+DATAF VLV_SIGNATURE_1
+DATAF VGV_X
+DATAF VGV_Y
+DATAF VGV_SIGNATURE
+ARRAY16 VLV_VALUES_1 2
+DATAF VLV_SIG1_1
+DATAF VLV_SIG2_1
 
 vmthread MAIN
 {
@@ -108,6 +118,16 @@ vmthread MAIN
 	MOVE32_32 0 timeMC7
 	MOVE32_32 0 timeMC8
 	MOVE32_32 0 timeMC9
+    MOVEF_F 0.0 VLV_PORT_1
+    MOVEF_F 0.0 VLV_X_1
+    MOVEF_F 0.0 VLV_Y_1
+    MOVEF_F 0.0 VLV_SIGNATURE_1
+    MOVEF_F 0.0 VGV_X
+    MOVEF_F 0.0 VGV_Y
+    MOVEF_F 0.0 VGV_SIGNATURE
+    CALL ARRAYCREATE_FLOAT VLV_VALUES_1
+    MOVEF_F 0.0 VLV_SIG1_1
+    MOVEF_F 0.0 VLV_SIG2_1
     ARRAY CREATE8 1 LOCKS
     CALL PROGRAM_MAIN -1
     PROGRAM_STOP -1
@@ -117,20 +137,76 @@ subcall PROGRAM_MAIN
     IN_32 SUBPROGRAM
     DATA32 INDEX
     ARRAY8 STACKPOINTER 4
+    DATAF F.0
+    DATAF F.1
+    DATAF F.2
+    DATAF F.3
+    DATAF F.4
+    DATAF F.5
     ARRAY32 RETURNSTACK2 128
     ARRAY32 RETURNSTACK 128
+    DATAS S.0 252
     MOVE8_8 0 STACKPOINTER
+    MOVEF_F 0.0 VLV_PORT_1
+    MOVEF_F 0.0 VLV_X_1
+    MOVEF_F 0.0 VLV_Y_1
+    MOVEF_F 0.0 VLV_SIGNATURE_1
+    MOVEF_F 0.0 VGV_X
+    MOVEF_F 0.0 VGV_Y
+    MOVEF_F 0.0 VGV_SIGNATURE
     CALL LCD.CLEAR
-    MOVEF_8 50.0 setPowerA
-	OUTPUT_POWER 0 3 setPowerA
-	OUTPUT_START 0 3
-  while2:
-    JR_NEQF 1.0 1.0 endwhile2
-  whilebody2:
-    JR_EQF 1.0 1.0 whilebody2
-  endwhile2:
+  while1:
+    JR_NEQF 1.0 1.0 endwhile1
+  whilebody1:
+    CALL LCD.CLEAR
+    MOVEF_F 1.0 VLV_PORT_1
+    WRITE32 ENDSUB_M_ADVPIXY_GETLARGEST_4:CALLSUB3 STACKPOINTER RETURNSTACK
+    ADD8 STACKPOINTER 1 STACKPOINTER
+    JR SUB_M_ADVPIXY_GETLARGEST_4
+CALLSUB3:
+    MOVEF_F VLV_X_1 VGV_X
+    MOVEF_F VLV_Y_1 VGV_Y
+    MOVEF_F VLV_SIGNATURE_1 VGV_SIGNATURE
+    STRINGS VALUE_FORMATTED VGV_SIGNATURE '%g' 99 S.0
+    CALL LCD.TEXT 1.0 10.0 10.0 2.0 S.0
+    STRINGS VALUE_FORMATTED VGV_X '%g' 99 S.0
+    CALL LCD.TEXT 1.0 10.0 40.0 2.0 S.0
+    STRINGS VALUE_FORMATTED VGV_Y '%g' 99 S.0
+    CALL LCD.TEXT 1.0 10.0 70.0 2.0 S.0
+    DATA32 milliseconds10
+	MOVEF_32 100.0 milliseconds10
+	DATA32 timer10
+	TIMER_WAIT milliseconds10 timer10
+	TIMER_READY timer10
+    JR_EQF 1.0 1.0 whilebody1
+  endwhile1:
 ENDTHREAD:
     RETURN
+SUB_M_ADVPIXY_GETLARGEST_4:
+    CALL SENSOR.READI2CREGISTERS VLV_PORT_1 1.0 80.0 6.0 VLV_VALUES_1
+    CALL ARRAYGET_FLOAT 0.0 VLV_SIG1_1 VLV_VALUES_1
+    CALL ARRAYGET_FLOAT 1.0 VLV_SIG2_1 VLV_VALUES_1
+    MULF VLV_SIG2_1 256.0 F.1
+    ADDF VLV_SIG1_1 F.1 F.0
+    MULF VLV_SIG2_1 256.0 F.5
+    ADDF VLV_SIG1_1 F.5 F.4
+    DATAF tmpf18
+    DATA8 flag18
+    DIVF F.4 8.0 tmpf18
+    CP_EQF 0.0 8.0 flag18
+    SELECTF flag18 0.0 tmpf18 F.3
+
+    MATH FLOOR F.3 F.2
+    MULF 8.0 F.2 F.1
+    SUBF F.0 F.1 VLV_SIGNATURE_1
+    CALL ARRAYGET_FLOAT 2.0 F.0 VLV_VALUES_1
+    SUBF F.0 128.0 VLV_X_1
+    CALL ARRAYGET_FLOAT 3.0 VLV_Y_1 VLV_VALUES_1
+RETSUB_M_ADVPIXY_GETLARGEST_4:
+    SUB8 STACKPOINTER 1 STACKPOINTER
+    READ32 RETURNSTACK STACKPOINTER INDEX
+    JR_DYNAMIC INDEX
+ENDSUB_M_ADVPIXY_GETLARGEST_4:
 }
 subcall LCD.CLEAR   // V
 {
@@ -140,4 +216,110 @@ subcall LCD.CLEAR   // V
 	JR_NEQ32 0 STOPLCDUPDATE skipupdate
 	UI_DRAW UPDATE
 skipupdate:
+}
+subcall LCD.TEXT     // FFFFSV
+{
+	IN_F col
+	IN_F x
+	IN_F y
+	IN_F font
+	IN_S text 252
+	
+	DATA8 col_8
+	DATA16 x_16
+	DATA16 y_16
+	DATA8 font_8	
+	MOVEF_8 col col_8
+	MOVEF_16 x x_16
+	MOVEF_16 y y_16
+	MOVEF_8 font font_8
+	
+	UI_DRAW SELECT_FONT font_8
+	UI_DRAW TEXT col_8 x_16 y_16 text
+
+	JR_NEQ32 0 STOPLCDUPDATE skipupdate
+	UI_DRAW UPDATE
+skipupdate:
+}
+subcall SENSOR.READI2CREGISTERS     // FFFFA
+{
+	IN_F port
+	IN_F address
+	IN_F registernumber
+	IN_F readbytes
+	IN_16 resultarray
+
+	DATA8 layer
+	DATA8 no
+	DATA8 adr
+	DATA32 rd
+	ARRAY8 outdata 2
+	ARRAY8 indata 32
+	DATA8 tmp8
+
+	MOVEF_8 port no
+	SUB8 no 1 no
+	DIV8 no 4 layer
+	MATH MOD8 no 4 no
+
+	MOVEF_32 readbytes rd
+	JR_GTEQ32 rd 1 rdnottoless
+	MOVE32_32 1 rd
+rdnottoless:
+	JR_LTEQ32 rd 32 rdnottomuch
+	MOVE32_32 32 rd
+rdnottomuch:
+
+	MOVEF_8 address tmp8
+	WRITE8 tmp8 0 outdata
+	MOVEF_8 registernumber tmp8
+	WRITE8 tmp8 1 outdata
+
+	// do the communciation
+	MOVE32_8 rd tmp8
+	INPUT_DEVICE SETUP layer no 1 0 2 outdata tmp8 indata 
+
+	// decode response
+	DATA32 i
+	DATAF v
+	ARRAY RESIZE resultarray rd
+	MOVE32_32 0 i
+readcopy:
+	DATA32 tmp32
+	SUB32 rd i tmp32
+	SUB32 tmp32 1 tmp32
+	MOVE32_8 tmp32 tmp8
+	READ8 indata tmp8 tmp8
+	MOVE8_32 0 tmp32
+	INJECTLOWBYTE tmp8 tmp32
+	MOVE32_F tmp32 v
+	ARRAY_WRITE resultarray i v
+	ADD32 i 1 i
+	JR_LT32 i rd readcopy
+}
+subcall ARRAYGET_FLOAT     // FFF
+{
+	IN_F index
+	OUT_F value
+	IN_16 handle
+	
+	DATA32 index32
+	DATA32 len
+	MOVEF_32 index index32
+	
+	ARRAY SIZE handle len
+	JR_LT32 index32 0 outofbounds
+	JR_GTEQ32 index32 len outofbounds
+	
+	ARRAY_READ handle index32 value
+	RETURN
+outofbounds:
+	MOVE8_F 0 value	
+}
+subcall ARRAYCREATE_FLOAT   // F
+{
+	OUT_16 handle
+	
+	ARRAY CREATEF 8 handle			// create with 8 elements
+	ARRAY FILL handle 0.0
 }

@@ -28,8 +28,6 @@ lv_port_9 = 0
 lv_result_9 = 0
 lv_port_10 = 0
 lv_coef_13 = 0
-lv_xodom_14 = 0
-lv_yodom_14 = 0
 lv_angle_11 = 0
 lv_red_min_19 = 0
 lv_red_max_19 = 0
@@ -43,12 +41,12 @@ lv_in_kd_21 = 0
 lv_in_limit_21 = 0
 lv_in_steer_center_21 = 0
 lv_power_8 = 0
-lv_x_3 = 0
-lv_y_3 = 0
 lv_target_24 = 0
 lv_iswhite_1 = 0
 lv_isorange_1 = 0
 lv_turnangle_6 = 0
+lv_x_3 = 0
+lv_y_3 = 0
 lv_angle_12 = 0
 lv_red_20 = 0
 lv_blue_20 = 0
@@ -62,10 +60,10 @@ lv_h_25 = 0
 lv_encoder_22 = 0
 lv_power_22 = 0
 lv_change_18 = 0
-lv_angle_15 = 0
-lv_encchange_15 = 0
-lv_xodom_16 = 0
-lv_yodom_16 = 0
+lv_angle_14 = 0
+lv_encchange_14 = 0
+lv_xodom_15 = 0
+lv_yodom_15 = 0
 lv_y_26 = 0
 lv_x_26 = 0
 lv_n_26 = 0
@@ -75,6 +73,8 @@ lv_angle_2 = 0
 lv_aim_2 = 0
 lv_x_4 = 0
 lv_y_4 = 0
+lv_xodom_16 = 0
+lv_yodom_16 = 0
 lv_x_5 = 0
 lv_y_5 = 0
 lv_x_23 = 0
@@ -139,9 +139,6 @@ EndWhile
 LCD.Clear ()
 lv_coef_13 = 15.43
 m_odometry_config_1 ()
-lv_xodom_14 = 0
-lv_yodom_14 = - 30
-m_odometry_reset_2 ()
 lv_angle_11 = 0
 m_advgyro_resetport2_1 ()
 m_advencoder_config_0 ()
@@ -199,11 +196,8 @@ While gv_uartready = 0 Or gv_steeringready = 0 Or gv_odometryready = 0
 EndWhile
 lv_power_8 = 50
 f_start_1 ()
-While 1 = 1
-lv_x_3 = gv_x + 20
-lv_y_3 = 0
-f_steertopoint_2 ()
-EndWhile
+MotorAB.OffAndBrake ()
+Program.Delay ( 100000000 )
 While gv_turncounter < 12
 f_drivetopoints_0 ()
 gv_iswhite = 1
@@ -258,12 +252,12 @@ gv_odometryready = 1
 While 1 = 1
 m_advencoder_getchangea_1 ()
 gv_encchangea = lv_change_18
-lv_angle_15 = gv_gyroangle
-lv_encchange_15 = gv_encchangea
+lv_angle_14 = gv_gyroangle
+lv_encchange_14 = gv_encchangea
 m_odometry_write_2 ()
 m_odometry_read_2 ()
-gv_x = lv_xodom_16
-gv_y = lv_yodom_16
+gv_x = lv_xodom_15
+gv_y = lv_yodom_15
 EndWhile
 EndSub
 Sub f_display_0
@@ -332,7 +326,7 @@ lv_b1_6 = 80.5
 lv_b2_6 = 136
 lv_x1_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y1_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
-lv_x_4 = 130
+lv_x_4 = 100
 lv_y_4 = 50
 f_drivetopointuntilline_2 ()
 lv_x2_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
@@ -352,8 +346,8 @@ lv_resetx_6 = ( lv_deltay_6 + lv_b1_6 - lv_b2_6 - 0.577 * lv_deltax_6 ) / 1.16
 lv_resety_6 = 1.73 * lv_resetx_6 + lv_b2_6
 lv_resetx_6 = lv_resetx_6 - Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_resety_6 = lv_resety_6 - Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
-lv_xodom_14 = lv_resetx_6
-lv_yodom_14 = lv_resety_6
+lv_xodom_16 = lv_resetx_6
+lv_yodom_16 = lv_resety_6
 m_odometry_reset_2 ()
 gv_turncounter = gv_turncounter + 1
 EndSub
@@ -421,24 +415,24 @@ pr_odometry_reset = 0
 pr_odometry_resxodom = 0
 pr_odometry_resyodom = 0
 EndSub
-Sub m_odometry_reset_2
-pr_odometry_resxodom = lv_xodom_14
-pr_odometry_resyodom = lv_yodom_14
-pr_odometry_reset = 1
-EndSub
 Sub m_odometry_write_2
 If pr_odometry_reset = 1 Then
 pr_odometry_x = pr_odometry_resxodom
 pr_odometry_y = pr_odometry_resyodom
 pr_odometry_reset = 0
 Else
-pr_odometry_x = pr_odometry_x + ( lv_encchange_15 / pr_odometry_coefficient ) * Math.Cos ( Math.GetRadians ( lv_angle_15 ) )
-pr_odometry_y = pr_odometry_y + ( lv_encchange_15 / pr_odometry_coefficient ) * Math.Sin ( Math.GetRadians ( lv_angle_15 ) )
+pr_odometry_x = pr_odometry_x + ( lv_encchange_14 / pr_odometry_coefficient ) * Math.Cos ( Math.GetRadians ( lv_angle_14 ) )
+pr_odometry_y = pr_odometry_y + ( lv_encchange_14 / pr_odometry_coefficient ) * Math.Sin ( Math.GetRadians ( lv_angle_14 ) )
 EndIf
 EndSub
 Sub m_odometry_read_2
-lv_xodom_16 = pr_odometry_x
-lv_yodom_16 = pr_odometry_y
+lv_xodom_15 = pr_odometry_x
+lv_yodom_15 = pr_odometry_y
+EndSub
+Sub m_odometry_reset_2
+pr_odometry_resxodom = lv_xodom_16
+pr_odometry_resyodom = lv_yodom_16
+pr_odometry_reset = 1
 EndSub
 Sub m_advencoder_config_0
 pr_advencoder_lasta = 0
