@@ -3,7 +3,7 @@ import "Mods\ColorRGB"
 Sensor.SetMode(3, 4)
 MotorC.StartPower(50)
 Program.Delay(2000)
-Motor.Move("C", -50, 71, "True")
+Motor.Move("C", -50, 54, "True")
 MotorAB.StartPower(30)
 LCD.Clear()
 Rmin = 500

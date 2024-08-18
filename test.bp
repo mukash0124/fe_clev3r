@@ -1,16 +1,11 @@
-import "Mods\ToolBox"
-import "Mods\AdvGyro"
-
-Sensor.SetMode(2, 0)
-AdvGyro.ResetPort2(0)
+import "Mods\AdvPixy"
 
 LCD.Clear()
 While 1=1
-  AdvGyro.WritePort2(angle)
-  enc = MotorA.GetTacho()
-  ToolBox.AngleWrap(100, wrapped_angle)
-  LCD.Text(1, 10, 10, 2, angle)
-  LCD.Text(1, 10, 50, 2, enc)
-  Program.Delay(500)
   LCD.Clear()
+  AdvPixy.getLargest(1, x, y, w, h, signature, sig1, sig2)
+  LCD.Text(1, 10, 10, 2, signature)
+  LCD.Text(1, 10, 40, 2, x)
+  LCD.Text(1, 10, 70, 2, y)
+  Program.Delay(100)
 EndWhile

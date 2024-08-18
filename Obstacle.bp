@@ -3,28 +3,12 @@ import "Mods\AdvEncoder"
 import "Mods\AdvGyro"
 import "Mods\ColorRGB"
 import "Mods\SteerControl"
-import "Mods\Pixy2"
+import "Mods\AdvPixy"
 import "Mods\Tool"
 import "Mods\ToolBox"
 
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
-
-AdvGyro.CheckReset(2, result)
-While result = 0
-  AdvGyro.HardReset(2)
-  AdvGyro.CheckReset(2, result)
-EndWhile
-
-LCD.Clear()
-Odometry.Config(15.43)
-AdvGyro.ResetPort2(0)
-AdvEncoder.Config()
-ColorRGB.Config(10, 250, 10, 250, 10, 250)
-SteerControl.Config(1.5, 0.1, 3, 48, 54)
-MotorC.StartPower(-80)
-Program.Delay(2000)
-MotorC.ResetCount()
 
 x_dot = Row.Init(2, 1)
 Row.write(x_dot, 0, -40)
@@ -34,6 +18,28 @@ y_dot = Row.Init(2, 1)
 Row.write(y_dot, 0, 0)
 Row.write(y_dot, 1, 0)
 
+AdvGyro.CheckReset(2, result)
+While result = 0
+  AdvGyro.HardReset(2)
+  AdvGyro.CheckReset(2, result)
+EndWhile
+
+col = EV3File.OpenRead("col")
+Rmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+Rmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+Gmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+Gmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+Bmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+Bmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
+ColorRGB.Config(Rmin, Rmax, Gmin, Gmax, Bmin, Bmax)
+
+Odometry.Config(15.43)
+AdvGyro.ResetPort2(0)
+AdvEncoder.Config()
+SteerControl.Config(1.5, 0.1, 3, 48, 54)
+MotorC.StartPower(-80)
+Program.Delay(2000)
+MotorC.ResetCount()
 
 angleKp = 2
 angleKd = 3
@@ -45,15 +51,7 @@ fakeWheelBase = 14.5
 UArtReady = 0
 SteeringReady = 0
 OdometryReady = 0
-
-col = EV3File.OpenRead("col")
-Rmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-Rmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-Gmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-Gmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-Bmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-Bmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
-ColorRGB.Config(Rmin, Rmax, Gmin, Gmax, Bmin, Bmax)
+I2CReady = 0
 
 Sub UArt
   UArtReady = 1
@@ -66,7 +64,7 @@ EndSub
 Sub I2C
   I2CReady = 1
   While 1=1
-    Pixy2.getSignature(1, 1, x_pixy, y_pixy, w_pixy, h_pixy)
+    AdvPixy.getLargest(1, pixyX, pixyY, signature)
   EndWhile
 EndSub
 
@@ -161,23 +159,16 @@ Function DriveToPoints()
   EndFor
 EndFunction
 
-Function Start(in number power)
-  isWhite = 1
-  isOrange = 0
-  MotorAB.StartPower(power)
-  While isWhite = 1
-    SteerControl.SetTarget(@gyroAngle)
-    ColorCheck(isWhite, isOrange)
-  EndWhile
-  @clockwise = isOrange
-  Speaker.Tone(100, 3000, 100)
-  Reset(@turnAngle)
+Function DetourObstacle()
+  If @signature = 1 Then
+    Speaker.Tone(100, 4000, 50)
+    desiredX = 40 * Math.Power(@pixyY, 0.22)
+  Else
+    Speaker.Tone(100, 500, 50)
+    desiredX = -40 * Math.Power(@pixyY, 0.22)
+  EndIf
+  SteerControl.SetTarget((desiredX - @pixyX) * 0.5)
 EndFunction
-
-Thread.Run = UArt
-'Thread.Run = I2C
-Thread.Run = Odometry
-Thread.Run = Steering
 
 Sub Display
   While 1=1 
@@ -188,41 +179,45 @@ Sub Display
   EndWhile
 EndSub
 
-Thread.Run = Display
+Thread.Run = UArt
+Thread.Run = I2C
+Thread.Run = Odometry
+Thread.Run = Steering
 
-While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
+Function Start(in number power)
+  isWhite = 1
+  isOrange = 0
+  MotorAB.StartPower(power)
+  While isWhite = 1
+    If @signature = 0 Then
+      SteerControl.SetTarget(@gyroAngle)
+    Else
+      DetourObstacle()
+    EndIf
+    ColorCheck(isWhite, isOrange)
+  EndWhile
+  @clockwise = isOrange
+  Speaker.Tone(100, 3000, 100)
+  Reset(@turnAngle)
+EndFunction
+
+While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0 Or I2CReady = 0
   
 EndWhile
 
-
 Start(50)
-
-While 1=1 
-  SteerToPoint(@X + 20, 0)
-EndWhile
-
 While turnCounter < 12
-  DriveToPoints()
   isWhite = 1
   isOrange = 0
-  While isWhite = 1 Or isOrange <> clockWise
-    SteerControl.SetTarget(gyroAngle)
+  While isWhite = 1
+    If @signature = 0 Then
+      SteerToPoint(@X + 20, 0)
+    Else
+      DetourObstacle()
+    EndIf
     ColorCheck(isWhite, isOrange)
   EndWhile
-  Speaker.Tone(100, 3000, 100)
   Reset(turnAngle)
-EndWhile
-
-While 1=1 
-  SteerToPoint(100, 50)
-EndWhile
-
-While 1=1 
-  ColorCheck(isWhite, isOrange)
-  LCD.Text(1, 10, 10, 2, isWhite)
-  LCD.Text(1, 10, 10, 2, isOrange)
-  Program.Delay(1)
-  LCD.Clear()
 EndWhile
 
 

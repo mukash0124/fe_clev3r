@@ -172,7 +172,7 @@ subcall PROGRAM_MAIN
 	DATA32 timer2
 	TIMER_WAIT milliseconds2 timer2
 	TIMER_READY timer2
-    CALL MOTOR.SCHEDULE 'C' -50.0 0.0 71.0 0.0 'True' 
+    CALL MOTOR.SCHEDULE 'C' -50.0 0.0 54.0 0.0 'True' 
 
 	DATA8 layer3
 	DATA8 nos3
