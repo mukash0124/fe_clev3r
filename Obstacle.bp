@@ -38,12 +38,16 @@ angleKd = 3
 angleOld = 0
 clockWise = 0
 turnCounter = 0
-turnAngle = 90.6
+turnAngle = 90.3
 fakeWheelBase = 14.5
 UArtReady = 0
 SteeringReady = 0
 OdometryReady = 0
 I2CReady = 0
+anglePointX = 0
+anglePointY = 0
+powerCenter = 50
+powerDetour = 30
 
 Sub UArt
   UArtReady = 1
@@ -130,7 +134,7 @@ Function Reset(in number turnAngle)
   isOrange = @clockWise
   While isWhite = 1 Or isOrange = @clockWise
     If @signature = 0 Then
-      SteerToPoint(100, 50)
+      SteerToPoint(@anglePointX, @anglePointY)
     Else
       DetourObstacle()
     EndIf
@@ -140,14 +144,18 @@ Function Reset(in number turnAngle)
   y2 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   If @clockWise = 0 Then
     AdvGyro.ResetPort2(@gyroAngle + turnAngle)
+    deltaX = y1 - y2
+    deltaY = x1 - x2
+    resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
+    resetY = -1.73 * resetX - b2
   Else
     AdvGyro.ResetPort2(@gyroAngle - turnAngle)
+    deltaX = y2 - y1
+    deltaY = x1 - x2
+    resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
+    resetY = 1.73 * resetX + b2
   EndIf
   AdvGyro.WritePort2(@gyroAngle)
-  deltaX = y2 - y1
-  deltaY = x1 - x2
-  resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
-  resetY = 1.73 * resetX + b2
   resetX = resetX - Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   resetY = resetY - Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   Odometry.Reset(resetX, resetY)
@@ -161,12 +169,12 @@ Function DriveToPoints()
 EndFunction
 
 Function DetourObstacle()
-  If @signature = 1 Then
-    Speaker.Tone(100, 4000, 50)
-    desiredX = -40 * Math.Power(@pixyY, 0.22)
+  If @signature = 2 Then
+    Speaker.Tone(50, 4000, 50)
+    desiredX = -0.0026 * @pixyY * @pixyY + 0.9926 * @pixyY + 26.461
   Else
-    Speaker.Tone(100, 500, 50)
-    desiredX = 40 * Math.Power(@pixyY, 0.22)
+    Speaker.Tone(50, 500, 50)
+    desiredX = 0.0026 * @pixyY * @pixyY - 0.9926 * @pixyY - 26.461
   EndIf
   SteerControl.SetTarget((desiredX - @pixyX) * 0.5)
 EndFunction
@@ -185,20 +193,28 @@ Thread.Run = I2C
 Thread.Run = Odometry
 Thread.Run = Steering
 
-Function Start(in number power)
+Function Start()
   isWhite = 1
   isOrange = 0
-  MotorAB.StartPower(power)
+  MotorAB.Start()
   While isWhite = 1 Or Time.Get1() < 500
-    If @signature = 0 Or @Y > 25 Then
+    If @signature = 0 Or @Y > 25 Or @Y < -25 Or @pixyY < 60 Then
+      MotorAB.SetPower(@powerCenter)
       SteerControl.SetTarget(@gyroAngle)
     Else
+      MotorAB.SetPower(@powerDetour)
       DetourObstacle()
     EndIf
     ColorCheck(isWhite, isOrange)
   EndWhile
   @clockwise = isOrange
-  Speaker.Tone(100, 3000, 100)
+  @anglePointX = 100
+  If isOrange = 1 Then
+    @anglePointY = 50
+  Else
+    @anglePointY = -50
+  EndIf
+  Speaker.Tone(50, 3000, 100)
   Reset(@turnAngle)
   Time.Reset1()
 EndFunction
@@ -207,21 +223,21 @@ While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0 Or I2CReady = 0
   
 EndWhile
 
-Start(50)
-While turnCounter < 12
+Start()
+While turnCounter < 13
   isWhite = 1
   isOrange = 0
   While isWhite = 1 Or Time.Get1() < 500
-    If @signature = 0 Or @Y > 25 Then
-      SteerToPoint(@X + 15, 0)
+    If @signature = 0 Or @Y > 25 Or @Y < -25 Or @pixyY < 60 Then
+      MotorAB.SetPower(powerCenter)
+      SteerToPoint(@X + 25, 0)
     Else
+      MotorAB.SetPower(powerDetour)
       DetourObstacle()
     EndIf
     ColorCheck(isWhite, isOrange)
   EndWhile
-  Speaker.Tone(100, 3000, 100)
+  Speaker.Tone(50, 3000, 100)
   Reset(turnAngle)
   Time.Reset1()
 EndWhile
-
-

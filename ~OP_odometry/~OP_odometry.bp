@@ -327,23 +327,27 @@ lv_b2_6 = 136
 lv_x1_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y1_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_x_4 = 100
-lv_y_4 = 50
+lv_y_4 = - 50
 f_drivetopointuntilline_2 ()
 lv_x2_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y2_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 If gv_clockwise = 0 Then
 lv_angle_11 = gv_gyroangle + lv_turnangle_6
 m_advgyro_resetport2_1 ()
+lv_deltax_6 = lv_y1_6 - lv_y2_6
+lv_deltay_6 = lv_x1_6 - lv_x2_6
+lv_resetx_6 = ( lv_deltay_6 + lv_b1_6 - lv_b2_6 - 0.577 * lv_deltax_6 ) / 1.16
+lv_resety_6 = - 1.73 * lv_resetx_6 - lv_b2_6
 Else
 lv_angle_11 = gv_gyroangle - lv_turnangle_6
 m_advgyro_resetport2_1 ()
-EndIf
-m_advgyro_writeport2_1 ()
-gv_gyroangle = lv_angle_12
 lv_deltax_6 = lv_y2_6 - lv_y1_6
 lv_deltay_6 = lv_x1_6 - lv_x2_6
 lv_resetx_6 = ( lv_deltay_6 + lv_b1_6 - lv_b2_6 - 0.577 * lv_deltax_6 ) / 1.16
 lv_resety_6 = 1.73 * lv_resetx_6 + lv_b2_6
+EndIf
+m_advgyro_writeport2_1 ()
+gv_gyroangle = lv_angle_12
 lv_resetx_6 = lv_resetx_6 - Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_resety_6 = lv_resety_6 - Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_xodom_16 = lv_resetx_6

@@ -136,19 +136,23 @@ Function Reset(in number turnAngle)
   b2 = 136
   x1 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   y1 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
-  DriveToPointUntilLine(100, 50)
+  DriveToPointUntilLine(100, -50)
   x2 = @X + Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   y2 = @Y + Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   If @clockWise = 0 Then
     AdvGyro.ResetPort2(@gyroAngle + turnAngle)
+    deltaX = y1 - y2
+    deltaY = x1 - x2
+    resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
+    resetY = -1.73 * resetX - b2
   Else
     AdvGyro.ResetPort2(@gyroAngle - turnAngle)
+    deltaX = y2 - y1
+    deltaY = x1 - x2
+    resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
+    resetY = 1.73 * resetX + b2
   EndIf
   AdvGyro.WritePort2(@gyroAngle)
-  deltaX = y2 - y1
-  deltaY = x1 - x2
-  resetX = (deltaY + b1 - b2 - 0.577 * deltaX) / 1.16
-  resetY = 1.73 * resetX + b2
   resetX = resetX - Math.Cos(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   resetY = resetY - Math.Sin(Math.GetRadians(@gyroAngle)) * @fakeWheelBase
   Odometry.Reset(resetX, resetY)
