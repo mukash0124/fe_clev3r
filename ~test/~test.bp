@@ -1,30 +1,9 @@
-lv_port_1 = 0
-lv_x_1 = 0
-lv_y_1 = 0
-lv_signature_1 = 0
-gv_x = 0
-gv_y = 0
-gv_signature = 0
-gv_xlogs = 0
-gv_ylogs = 0
-LCD.Clear ()
-gv_xlogs = EV3File.OpenWrite ( "xlogs" )
-gv_ylogs = EV3File.OpenWrite ( "ylogs" )
-While 1 = 1
-Speaker.Tone ( 100 , 2000 , 50 )
-lv_port_1 = 1
-m_advpixy_getlargest_4 ()
-gv_x = lv_x_1
-gv_y = lv_y_1
-gv_signature = lv_signature_1
-EV3File.WriteLine ( gv_xlogs , gv_x )
-EV3File.WriteLine ( gv_ylogs , gv_y )
-EndWhile
-Sub m_advpixy_getlargest_4
-lv_values_1 = Sensor.ReadI2CRegisters ( lv_port_1 , 1 , 80 , 6 )
-lv_sig1_1 = lv_values_1 [ 0 ]
-lv_sig2_1 = lv_values_1 [ 1 ]
-lv_signature_1 = ( lv_sig1_1 + lv_sig2_1 * 256 ) - 8 * Math.Floor ( ( lv_sig1_1 + lv_sig2_1 * 256 ) / 8 )
-lv_x_1 = lv_values_1 [ 2 ] - 128
-lv_y_1 = lv_values_1 [ 3 ]
+gv_a = 0
+gv_a = 0
+f_test1_0 ()
+LCD.Text ( 1 , 10 , 10 , 2 , gv_a )
+Program.Delay ( 100000 )
+Sub f_test1_0
+Motor.Move ( "AB" , 100 , 1000 , "True" )
+gv_a = 10
 EndSub

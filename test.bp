@@ -1,6 +1,14 @@
-import "Mods\AdvPixy"
-import "Mods\AdvGyro"
+a = 0
+Function test1()
+  Motor.Move("AB", 100, 1000, "True")
+  @a = 10
+EndFunction
 
-While 1=1
-  LCD.
-EndWhile
+Function test2()
+  Speaker.Tone(100, 400, 5000)
+EndFunction
+
+
+test1()
+LCD.Text(1, 10, 10, 2, a)
+Program.Delay(100000)

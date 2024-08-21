@@ -45,14 +45,16 @@ lv_y_3 = 0
 lv_iswhite_1 = 0
 lv_isorange_1 = 0
 lv_turnangle_6 = 0
+lv_target_25 = 0
 lv_angle_13 = 0
+lv_in_limit_26 = 0
 lv_red_15 = 0
 lv_blue_15 = 0
 lv_green_15 = 0
-lv_port_26 = 0
-lv_x_26 = 0
-lv_y_26 = 0
-lv_signature_26 = 0
+lv_port_27 = 0
+lv_x_27 = 0
+lv_y_27 = 0
+lv_signature_27 = 0
 lv_encoder_23 = 0
 lv_power_23 = 0
 lv_change_21 = 0
@@ -60,14 +62,13 @@ lv_angle_17 = 0
 lv_encchange_17 = 0
 lv_xodom_18 = 0
 lv_yodom_18 = 0
-lv_y_27 = 0
-lv_x_27 = 0
-lv_n_27 = 0
-lv_angle_28 = 0
-lv_wrapped_angle_28 = 0
+lv_y_28 = 0
+lv_x_28 = 0
+lv_n_28 = 0
+lv_angle_29 = 0
+lv_wrapped_angle_29 = 0
 lv_angle_2 = 0
 lv_aim_2 = 0
-lv_target_25 = 0
 lv_xodom_19 = 0
 lv_yodom_19 = 0
 lv_x_5 = 0
@@ -124,6 +125,8 @@ gv_anglepointy = 0
 gv_powercenter = 0
 gv_powerdetour = 0
 gv_lastsignature = 0
+gv_yrange = 0
+gv_ycamerarange = 0
 Sensor.SetMode ( 2 , 0 )
 Sensor.SetMode ( 3 , 4 )
 lv_port_10 = 2
@@ -158,28 +161,30 @@ m_advencoder_config_0 ()
 lv_in_kp_22 = 1.5
 lv_in_ki_22 = 0.1
 lv_in_kd_22 = 3
-lv_in_limit_22 = 44
+lv_in_limit_22 = 45
 lv_in_steer_center_22 = 54
 m_steercontrol_config_5 ()
 MotorC.StartPower ( - 80 )
 Program.Delay ( 2000 )
 MotorC.ResetCount ()
 gv_anglekp = 2
-gv_anglekd = 3
+gv_anglekd = 0
 gv_angleold = 0
 gv_clockwise = 0
 gv_turncounter = 0
-gv_turnangle = 89.6
-gv_fakewheelbase = 14.5
+gv_turnangle = 90.3
+gv_fakewheelbase = 13.9
 gv_uartready = 0
 gv_steeringready = 0
 gv_odometryready = 0
 gv_i2cready = 0
 gv_anglepointx = 0
 gv_anglepointy = 0
-gv_powercenter = 100
-gv_powerdetour = 100
+gv_powercenter = 70
+gv_powerdetour = 60
 gv_lastsignature = 0
+gv_yrange = 25
+gv_ycamerarange = 25
 Thread.Run = f_uart_0
 Thread.Run = f_i2c_0
 Thread.Run = f_odometry_0
@@ -188,11 +193,11 @@ Thread.Run = f_display_0
 While gv_uartready = 0 Or gv_steeringready = 0 Or gv_odometryready = 0 Or gv_i2cready = 0
 EndWhile
 f_start_0 ()
-While gv_turncounter < 100
+While gv_turncounter < 8
 gv_iswhite = 1
 gv_isorange = 0
-While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
-If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+While gv_iswhite = 1 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
 MotorAB.SetPower ( gv_powercenter )
 lv_x_3 = gv_x + 25
 lv_y_3 = 0
@@ -208,28 +213,19 @@ EndWhile
 Speaker.Tone ( 50 , 3000 , 100 )
 lv_turnangle_6 = gv_turnangle
 f_reset_1 ()
-Time.Reset1 ()
 EndWhile
-gv_iswhite = 1
-gv_isorange = 0
-While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
-If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+If gv_lastsignature = 1 Then
+Time.Reset1 ()
+While Time.Get1 () < 1200
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
 MotorAB.SetPower ( gv_powercenter )
-lv_x_3 = gv_x + 25
-lv_y_3 = 0
-f_steertopoint_2 ()
+lv_target_25 = gv_gyroangle
+m_steercontrol_settarget_1 ()
 Else
 MotorAB.SetPower ( gv_powerdetour )
 f_detourobstacle_0 ()
 EndIf
-f_colorcheck_2 ()
-gv_iswhite = lv_iswhite_1
-gv_isorange = lv_isorange_1
 EndWhile
-Speaker.Tone ( 50 , 3000 , 100 )
-gv_turncounter = gv_turncounter + 1
-Time.Reset1 ()
-If gv_lastsignature = 1 Then
 If gv_clockwise = 0 Then
 gv_clockwise = 1
 gv_anglepointy = 50
@@ -241,25 +237,32 @@ lv_angle_12 = gv_gyroangle - 180
 m_advgyro_resetport2_1 ()
 m_advgyro_writeport2_1 ()
 gv_gyroangle = lv_angle_13
-MotorAB.OffAndBrake ()
-While gv_x > 0
-If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+EndIf
+lv_in_limit_26 = 50
+m_steercontrol_changelimit_1 ()
+While gv_iswhite = 1 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
 MotorAB.SetPower ( gv_powercenter )
-lv_x_3 = gv_x + 25
-lv_y_3 = 0
-f_steertopoint_2 ()
+lv_target_25 = gv_gyroangle
+m_steercontrol_settarget_1 ()
 Else
 MotorAB.SetPower ( gv_powerdetour )
 f_detourobstacle_0 ()
 EndIf
+f_colorcheck_2 ()
+gv_iswhite = lv_iswhite_1
+gv_isorange = lv_isorange_1
 EndWhile
-EndIf
-Speaker.Tone ( 50 , 300 , 300 )
-While gv_turncounter < 13
+Speaker.Tone ( 50 , 3000 , 100 )
+lv_turnangle_6 = gv_turnangle
+f_reset_1 ()
+lv_in_limit_26 = 45
+m_steercontrol_changelimit_1 ()
+While gv_turncounter < 12
 gv_iswhite = 1
 gv_isorange = 0
-While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
-If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+While gv_iswhite = 1 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
 MotorAB.SetPower ( gv_powercenter )
 lv_x_3 = gv_x + 25
 lv_y_3 = 0
@@ -275,7 +278,6 @@ EndWhile
 Speaker.Tone ( 50 , 3000 , 100 )
 lv_turnangle_6 = gv_turnangle
 f_reset_1 ()
-Time.Reset1 ()
 EndWhile
 Sub f_uart_0
 gv_uartready = 1
@@ -291,11 +293,11 @@ EndSub
 Sub f_i2c_0
 gv_i2cready = 1
 While 1 = 1
-lv_port_26 = 1
+lv_port_27 = 1
 m_advpixy_getlargest_4 ()
-gv_pixyx = lv_x_26
-gv_pixyy = lv_y_26
-gv_signature = lv_signature_26
+gv_pixyx = lv_x_27
+gv_pixyy = lv_y_27
+gv_signature = lv_signature_27
 EndWhile
 EndSub
 Sub f_steering_0
@@ -347,13 +349,13 @@ EndSub
 Sub f_steertopoint_2
 lv_deltax_3 = lv_x_3 - gv_x
 lv_deltay_3 = lv_y_3 - gv_y
-lv_y_27 = lv_deltay_3
-lv_x_27 = lv_deltax_3
+lv_y_28 = lv_deltay_3
+lv_x_28 = lv_deltax_3
 m_tool_atan2_3 ()
-lv_heading_3 = lv_n_27
-lv_angle_28 = gv_gyroangle - lv_heading_3
+lv_heading_3 = lv_n_28
+lv_angle_29 = gv_gyroangle - lv_heading_3
 m_toolbox_anglewrap_2 ()
-lv_error_3 = lv_wrapped_angle_28
+lv_error_3 = lv_wrapped_angle_29
 lv_angle_2 = lv_error_3
 f_anglecore_2 ()
 lv_headingdifference_3 = lv_aim_2
@@ -387,6 +389,7 @@ f_colorcheck_2 ()
 lv_iswhite_6 = lv_iswhite_1
 lv_isorange_6 = lv_isorange_1
 EndWhile
+Speaker.Tone ( 50 , 3000 , 100 )
 lv_x2_6 = gv_x + Math.Cos ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 lv_y2_6 = gv_y + Math.Sin ( Math.GetRadians ( gv_gyroangle ) ) * gv_fakewheelbase
 If gv_clockwise = 0 Then
@@ -415,15 +418,15 @@ gv_turncounter = gv_turncounter + 1
 EndSub
 Sub f_detourobstacle_0
 If gv_signature = 2 Then
-Speaker.Tone ( 50 , 1500 , 50 )
-lv_desiredx_8 = 0.226 * gv_pixyy + 74.9
+Speaker.Tone ( 100 , 2000 , 50 )
+lv_desiredx_8 = - 0.0026 * gv_pixyy * gv_pixyy + 0.9926 * gv_pixyy + 26.461
 Else
-Speaker.Tone ( 50 , 500 , 50 )
-lv_desiredx_8 = - 0.226 * gv_pixyy - 74.9
+Speaker.Tone ( 100 , 300 , 50 )
+lv_desiredx_8 = 0.0026 * gv_pixyy * gv_pixyy - 0.9926 * gv_pixyy - 26.461
 EndIf
 lv_target_25 = ( lv_desiredx_8 - gv_pixyx ) * 0.5
 m_steercontrol_settarget_1 ()
-If gv_pixyy > 70 And gv_turnangle < 8 Then
+If gv_turnangle < 8 Then
 gv_lastsignature = gv_signature
 EndIf
 EndSub
@@ -431,8 +434,8 @@ Sub f_start_0
 lv_iswhite_9 = 1
 lv_isorange_9 = 0
 MotorAB.Start ()
-While lv_iswhite_9 = 1 Or Time.Get1 () < 500
-If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+While lv_iswhite_9 = 1
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
 MotorAB.SetPower ( gv_powercenter )
 lv_target_25 = gv_gyroangle
 m_steercontrol_settarget_1 ()
@@ -454,7 +457,6 @@ EndIf
 Speaker.Tone ( 50 , 3000 , 100 )
 lv_turnangle_6 = gv_turnangle
 f_reset_1 ()
-Time.Reset1 ()
 EndSub
 Sub m_advgyro_checkreset_2
 Sensor.SetMode ( lv_port_10 , 0 )
@@ -484,9 +486,9 @@ EndSub
 Sub m_advgyro_writeport2_1
 lv_value_13 = Sensor2.Raw1 ()
 lv_unwrapped_angle_13 = lv_value_13 - pr_advgyro_gyro_last
-lv_angle_28 = lv_unwrapped_angle_13
+lv_angle_29 = lv_unwrapped_angle_13
 m_toolbox_anglewrap_2 ()
-lv_angle_13 = lv_wrapped_angle_28
+lv_angle_13 = lv_wrapped_angle_29
 pr_advgyro_gyro_angle = lv_angle_13
 EndSub
 Sub m_colorrgb_config_6
@@ -582,38 +584,41 @@ EndSub
 Sub m_steercontrol_settarget_1
 pr_steercontrol_steer_target = lv_target_25
 EndSub
+Sub m_steercontrol_changelimit_1
+pr_steercontrol_limit = lv_in_limit_26
+EndSub
 Sub m_advpixy_getlargest_4
-lv_values_26 = Sensor.ReadI2CRegisters ( lv_port_26 , 1 , 80 , 6 )
-lv_sig1_26 = lv_values_26 [ 0 ]
-lv_sig2_26 = lv_values_26 [ 1 ]
-lv_signature_26 = ( lv_sig1_26 + lv_sig2_26 * 256 ) - 8 * Math.Floor ( ( lv_sig1_26 + lv_sig2_26 * 256 ) / 8 )
-lv_x_26 = lv_values_26 [ 2 ] - 128
-lv_y_26 = lv_values_26 [ 3 ]
+lv_values_27 = Sensor.ReadI2CRegisters ( lv_port_27 , 1 , 80 , 6 )
+lv_sig1_27 = lv_values_27 [ 0 ]
+lv_sig2_27 = lv_values_27 [ 1 ]
+lv_signature_27 = ( lv_sig1_27 + lv_sig2_27 * 256 ) - 8 * Math.Floor ( ( lv_sig1_27 + lv_sig2_27 * 256 ) / 8 )
+lv_x_27 = lv_values_27 [ 2 ] - 128
+lv_y_27 = lv_values_27 [ 3 ]
 EndSub
 Sub m_tool_atan2_3
-If lv_x_27 > 0 Then
-lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) )
-ElseIf lv_x_27 < 0 Then
-If lv_y_27 >= 0 Then
-lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) ) + 180
+If lv_x_28 > 0 Then
+lv_n_28 = Math.GetDegrees ( Math.ArcTan ( lv_y_28 / lv_x_28 ) )
+ElseIf lv_x_28 < 0 Then
+If lv_y_28 >= 0 Then
+lv_n_28 = Math.GetDegrees ( Math.ArcTan ( lv_y_28 / lv_x_28 ) ) + 180
 Else
-lv_n_27 = Math.GetDegrees ( Math.ArcTan ( lv_y_27 / lv_x_27 ) ) - 180
+lv_n_28 = Math.GetDegrees ( Math.ArcTan ( lv_y_28 / lv_x_28 ) ) - 180
 EndIf
-ElseIf lv_x_27 = 0 Then
-If lv_y_27 = 0 Then
-lv_n_27 = 0
-ElseIf lv_y_27 > 0 Then
-lv_n_27 = 90
-ElseIf lv_y_27 < 0 Then
-lv_n_27 = - 90
+ElseIf lv_x_28 = 0 Then
+If lv_y_28 = 0 Then
+lv_n_28 = 0
+ElseIf lv_y_28 > 0 Then
+lv_n_28 = 90
+ElseIf lv_y_28 < 0 Then
+lv_n_28 = - 90
 EndIf
 EndIf
 EndSub
 Sub m_toolbox_anglewrap_2
-If lv_angle_28 < 0 Then
-lv_a_28 = - 180
+If lv_angle_29 < 0 Then
+lv_a_29 = - 180
 Else
-lv_a_28 = 180
+lv_a_29 = 180
 EndIf
-lv_wrapped_angle_28 = Math.Remainder ( ( lv_angle_28 + lv_a_28 ) , 360 ) - lv_a_28
+lv_wrapped_angle_29 = Math.Remainder ( ( lv_angle_29 + lv_a_29 ) , 360 ) - lv_a_29
 EndSub
