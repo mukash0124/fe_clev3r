@@ -40,8 +40,8 @@ lv_in_ki_21 = 0
 lv_in_kd_21 = 0
 lv_in_limit_21 = 0
 lv_in_steer_center_21 = 0
-lv_power_8 = 0
 lv_target_24 = 0
+lv_power_8 = 0
 lv_iswhite_1 = 0
 lv_isorange_1 = 0
 lv_turnangle_6 = 0
@@ -155,9 +155,10 @@ lv_in_kd_21 = 3
 lv_in_limit_21 = 48
 lv_in_steer_center_21 = 54
 m_steercontrol_config_5 ()
-MotorC.StartPower ( - 80 )
+MotorC.StartPower ( - 100 )
 Program.Delay ( 2000 )
 MotorC.ResetCount ()
+Speaker.Tone ( 100 , 2000 , 300 )
 gv_x_dot = Row.Init ( 2 , 1 )
 Row.write ( gv_x_dot , 0 , - 40 )
 Row.write ( gv_x_dot , 1 , 40 )
@@ -193,6 +194,10 @@ Thread.Run = f_odometry_0
 Thread.Run = f_steering_0
 Thread.Run = f_display_0
 While gv_uartready = 0 Or gv_steeringready = 0 Or gv_odometryready = 0
+EndWhile
+While 1 = 1
+lv_target_24 = gv_gyroangle
+m_steercontrol_settarget_1 ()
 EndWhile
 lv_power_8 = 50
 f_start_1 ()
@@ -262,8 +267,7 @@ EndWhile
 EndSub
 Sub f_display_0
 While 1 = 1
-LCD.Text ( 1 , 10 , 10 , 2 , gv_x )
-LCD.Text ( 1 , 10 , 40 , 2 , gv_y )
+LCD.Text ( 1 , 10 , 10 , 2 , MotorC.GetTacho () )
 Program.Delay ( 1 )
 LCD.Clear ()
 EndWhile

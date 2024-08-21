@@ -123,6 +123,7 @@ gv_anglepointx = 0
 gv_anglepointy = 0
 gv_powercenter = 0
 gv_powerdetour = 0
+gv_lastsignature = 0
 Sensor.SetMode ( 2 , 0 )
 Sensor.SetMode ( 3 , 4 )
 lv_port_10 = 2
@@ -157,7 +158,7 @@ m_advencoder_config_0 ()
 lv_in_kp_22 = 1.5
 lv_in_ki_22 = 0.1
 lv_in_kd_22 = 3
-lv_in_limit_22 = 48
+lv_in_limit_22 = 44
 lv_in_steer_center_22 = 54
 m_steercontrol_config_5 ()
 MotorC.StartPower ( - 80 )
@@ -168,7 +169,7 @@ gv_anglekd = 3
 gv_angleold = 0
 gv_clockwise = 0
 gv_turncounter = 0
-gv_turnangle = 90.3
+gv_turnangle = 89.6
 gv_fakewheelbase = 14.5
 gv_uartready = 0
 gv_steeringready = 0
@@ -176,20 +177,89 @@ gv_odometryready = 0
 gv_i2cready = 0
 gv_anglepointx = 0
 gv_anglepointy = 0
-gv_powercenter = 50
-gv_powerdetour = 30
+gv_powercenter = 100
+gv_powerdetour = 100
+gv_lastsignature = 0
 Thread.Run = f_uart_0
 Thread.Run = f_i2c_0
 Thread.Run = f_odometry_0
 Thread.Run = f_steering_0
+Thread.Run = f_display_0
 While gv_uartready = 0 Or gv_steeringready = 0 Or gv_odometryready = 0 Or gv_i2cready = 0
 EndWhile
 f_start_0 ()
+While gv_turncounter < 100
+gv_iswhite = 1
+gv_isorange = 0
+While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+MotorAB.SetPower ( gv_powercenter )
+lv_x_3 = gv_x + 25
+lv_y_3 = 0
+f_steertopoint_2 ()
+Else
+MotorAB.SetPower ( gv_powerdetour )
+f_detourobstacle_0 ()
+EndIf
+f_colorcheck_2 ()
+gv_iswhite = lv_iswhite_1
+gv_isorange = lv_isorange_1
+EndWhile
+Speaker.Tone ( 50 , 3000 , 100 )
+lv_turnangle_6 = gv_turnangle
+f_reset_1 ()
+Time.Reset1 ()
+EndWhile
+gv_iswhite = 1
+gv_isorange = 0
+While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+MotorAB.SetPower ( gv_powercenter )
+lv_x_3 = gv_x + 25
+lv_y_3 = 0
+f_steertopoint_2 ()
+Else
+MotorAB.SetPower ( gv_powerdetour )
+f_detourobstacle_0 ()
+EndIf
+f_colorcheck_2 ()
+gv_iswhite = lv_iswhite_1
+gv_isorange = lv_isorange_1
+EndWhile
+Speaker.Tone ( 50 , 3000 , 100 )
+gv_turncounter = gv_turncounter + 1
+Time.Reset1 ()
+If gv_lastsignature = 1 Then
+If gv_clockwise = 0 Then
+gv_clockwise = 1
+gv_anglepointy = 50
+Else
+gv_clockwise = 0
+gv_anglepointy = - 50
+EndIf
+lv_angle_12 = gv_gyroangle - 180
+m_advgyro_resetport2_1 ()
+m_advgyro_writeport2_1 ()
+gv_gyroangle = lv_angle_13
+MotorAB.OffAndBrake ()
+While gv_x > 0
+If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
+MotorAB.SetPower ( gv_powercenter )
+lv_x_3 = gv_x + 25
+lv_y_3 = 0
+f_steertopoint_2 ()
+Else
+MotorAB.SetPower ( gv_powerdetour )
+f_detourobstacle_0 ()
+EndIf
+EndWhile
+EndIf
+Speaker.Tone ( 50 , 300 , 300 )
 While gv_turncounter < 13
 gv_iswhite = 1
 gv_isorange = 0
-While gv_iswhite = 1 Or Time.Get1 () < 500
-If gv_signature = 0 Or gv_y > 25 Or gv_y < - 25 Or gv_pixyy < 60 Then
+While gv_iswhite = 1 Or Time.Get1 () < 500 Or gv_isorange <> gv_clockwise
+If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
 MotorAB.SetPower ( gv_powercenter )
 lv_x_3 = gv_x + 25
 lv_y_3 = 0
@@ -248,6 +318,14 @@ m_odometry_write_2 ()
 m_odometry_read_2 ()
 gv_x = lv_xodom_18
 gv_y = lv_yodom_18
+EndWhile
+EndSub
+Sub f_display_0
+While 1 = 1
+LCD.Text ( 1 , 10 , 10 , 2 , gv_x )
+LCD.Text ( 1 , 10 , 40 , 2 , gv_y )
+Program.Delay ( 1 )
+LCD.Clear ()
 EndWhile
 EndSub
 Sub f_colorcheck_2
@@ -337,21 +415,24 @@ gv_turncounter = gv_turncounter + 1
 EndSub
 Sub f_detourobstacle_0
 If gv_signature = 2 Then
-Speaker.Tone ( 50 , 4000 , 50 )
-lv_desiredx_8 = - 0.0026 * gv_pixyy * gv_pixyy + 0.9926 * gv_pixyy + 26.461
+Speaker.Tone ( 50 , 1500 , 50 )
+lv_desiredx_8 = 0.226 * gv_pixyy + 74.9
 Else
 Speaker.Tone ( 50 , 500 , 50 )
-lv_desiredx_8 = 0.0026 * gv_pixyy * gv_pixyy - 0.9926 * gv_pixyy - 26.461
+lv_desiredx_8 = - 0.226 * gv_pixyy - 74.9
 EndIf
 lv_target_25 = ( lv_desiredx_8 - gv_pixyx ) * 0.5
 m_steercontrol_settarget_1 ()
+If gv_pixyy > 70 And gv_turnangle < 8 Then
+gv_lastsignature = gv_signature
+EndIf
 EndSub
 Sub f_start_0
 lv_iswhite_9 = 1
 lv_isorange_9 = 0
 MotorAB.Start ()
 While lv_iswhite_9 = 1 Or Time.Get1 () < 500
-If gv_signature = 0 Or gv_y > 25 Or gv_y < - 25 Or gv_pixyy < 60 Then
+If gv_signature = 0 Or gv_y > 35 Or gv_y < - 35 Then
 MotorAB.SetPower ( gv_powercenter )
 lv_target_25 = gv_gyroangle
 m_steercontrol_settarget_1 ()

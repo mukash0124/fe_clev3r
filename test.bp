@@ -1,11 +1,6 @@
 import "Mods\AdvPixy"
+import "Mods\AdvGyro"
 
-LCD.Clear()
 While 1=1
-  LCD.Clear()
-  AdvPixy.getLargest(1, x, y, signature)
-  LCD.Text(1, 10, 10, 2, signature)
-  LCD.Text(1, 10, 40, 2, x)
-  LCD.Text(1, 10, 70, 2, y)
-  Program.Delay(100)
+  LCD.
 EndWhile

@@ -22,9 +22,10 @@ AdvGyro.ResetPort2(0)
 AdvEncoder.Config()
 ColorRGB.Config(10, 250, 10, 250, 10, 250)
 SteerControl.Config(1.5, 0.1, 3, 48, 54)
-MotorC.StartPower(-80)
+MotorC.StartPower(-100)
 Program.Delay(2000)
 MotorC.ResetCount()
+Speaker.Tone(100, 2000, 300)
 
 x_dot = Row.Init(2, 1)
 Row.write(x_dot, 0, -40)
@@ -185,8 +186,7 @@ Thread.Run = Steering
 
 Sub Display
   While 1=1 
-    LCD.Text(1, 10, 10, 2, X)
-    LCD.Text(1, 10, 40, 2, Y)
+    LCD.Text(1, 10, 10, 2, MotorC.GetTacho())
     Program.Delay(1)
     LCD.Clear()
   EndWhile
@@ -196,6 +196,10 @@ Thread.Run = Display
 
 While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
   
+EndWhile
+
+While 1=1 
+  SteerControl.SetTarget(@gyroAngle)
 EndWhile
 
 

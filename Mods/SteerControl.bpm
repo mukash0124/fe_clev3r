@@ -37,3 +37,7 @@ EndFunction
 Function SetTarget(in number target)
   steer_target = target
 EndFunction
+
+Function ChangeLimit(in number in_limit)
+  limit = in_limit
+EndFunction
