@@ -185,7 +185,7 @@ subcall PROGRAM_MAIN
 	SLEEP
 	JR motorwaiting3
   motornotbusy3:
-    MOVEF_8 30.0 setPowerA
+    MOVEF_8 50.0 setPowerA
 	OUTPUT_POWER 0 3 setPowerA
 	OUTPUT_START 0 3
     CALL LCD.CLEAR

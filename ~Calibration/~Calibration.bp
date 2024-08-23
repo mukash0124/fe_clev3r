@@ -12,7 +12,7 @@ Sensor.SetMode ( 3 , 4 )
 MotorC.StartPower ( 50 )
 Program.Delay ( 2000 )
 Motor.Move ( "C" , - 50 , 54 , "True" )
-MotorAB.StartPower ( 30 )
+MotorAB.StartPower ( 50 )
 LCD.Clear ()
 gv_rmin = 500
 gv_gmin = 500

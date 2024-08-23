@@ -186,7 +186,8 @@ Thread.Run = Steering
 
 Sub Display
   While 1=1 
-    LCD.Text(1, 10, 10, 2, MotorC.GetTacho())
+    LCD.Text(1, 10, 10, 2, X)
+    LCD.Text(1, 10, 10, 2, Y)
     Program.Delay(1)
     LCD.Clear()
   EndWhile
