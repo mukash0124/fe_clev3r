@@ -120,12 +120,11 @@ gv_uartready = 0
 gv_steeringready = 0
 gv_odometryready = 0
 gv_i2cready = 0
-gv_centerpower = 0
-gv_detourpower = 0
 gv_lastsignature = 0
 gv_yrange = 0
 gv_ycamerarange = 0
 gv_target = 0
+Speaker.Tone ( 50 , 300 , 100 )
 Sensor.SetMode ( 2 , 0 )
 Sensor.SetMode ( 3 , 4 )
 lv_port_14 = 2
@@ -167,7 +166,7 @@ m_steercontrol_config_5 ()
 MotorC.StartPower ( - 80 )
 Program.Delay ( 2000 )
 MotorC.ResetCount ()
-gv_anglekp = 1
+gv_anglekp = 0.7
 gv_anglekd = 3
 gv_angleold = 0
 gv_clockwise = 0
@@ -178,11 +177,9 @@ gv_uartready = 0
 gv_steeringready = 0
 gv_odometryready = 0
 gv_i2cready = 0
-gv_centerpower = 80
-gv_detourpower = 80
 gv_lastsignature = 1
-gv_yrange = 32
-gv_ycamerarange = 25
+gv_yrange = 37
+gv_ycamerarange = 15
 Thread.Run = f_uart_0
 Thread.Run = f_i2c_0
 Thread.Run = f_odometry_0
@@ -417,18 +414,20 @@ lv_target_29 = ( lv_desiredx_11 - gv_pixyx ) * 0.5
 m_steercontrol_settarget_1 ()
 EndSub
 Sub f_autopilot_0
-If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Then
+If gv_signature = 0 Or gv_y > gv_yrange Or gv_y < - gv_yrange Or gv_pixyy < gv_ycamerarange Then
+MotorAB.SetPower ( 80 )
 lv_x_4 = gv_x + 50
 lv_y_4 = 0
 f_steertopoint_2 ()
 Else
+MotorAB.SetPower ( 50 )
 f_detourobstacle_0 ()
 EndIf
 EndSub
 Sub f_start_0
 lv_iswhite_13 = 1
 lv_isorange_13 = 0
-MotorAB.StartPower ( 60 )
+MotorAB.Start ()
 While lv_iswhite_13 = 1
 f_autopilot_0 ()
 f_colorcheck_2 ()

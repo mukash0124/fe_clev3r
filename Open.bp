@@ -3,14 +3,14 @@ import "Mods\AdvEncoder"
 import "Mods\AdvGyro"
 import "Mods\ColorRGB"
 import "Mods\SteerControl"
-import "Mods\AdvPixy"
-import "Mods\Tool"
-import "Mods\ToolBox"
+import "Mods\AdvUltrasonic"
 
 Speaker.Tone(50, 300, 100)
 
+Sensor.SetMode(1, 0)
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
+Sensor.SetMode(4, 0)
 
 AdvGyro.CheckReset(2, result)
 While result = 0
@@ -28,44 +28,34 @@ Bmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 Bmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 ColorRGB.Config(Rmin, Rmax, Gmin, Gmax, Bmin, Bmax)
 
+AdvUltrasonic.ReadPort1(fDistance)
+AdvUltrasonic.ReadPort4(sDistance)
+
 Odometry.Config(15.53)
+Odometry.Reset(0, 0)
 AdvGyro.ResetPort2(0)
 AdvEncoder.Config()
-SteerControl.Config(1.5, 0.1, 3, 40, 54)
+SteerControl.Config(1.5, 0.1, 3, 45, 54)
 MotorC.StartPower(-80)
 Program.Delay(2000)
-If MotorC.GetTacho() < -25 Then
-  UTurn = 1
-Else
-  UTurn = 0
-EndIf
 MotorC.ResetCount()
 
-angleKp = 0.7
+angleKp = 1.2
 angleKd = 3
 angleOld = 0
 clockWise = 0
 turnCounter = 0
-turnAngle = 90
+turnAngle = 90.9
 UArtReady = 0
 SteeringReady = 0
 OdometryReady = 0
-I2CReady = 0
-yRange = 37
-yCameraRange = 15
+yPos = 0
 
 Sub UArt
   UArtReady = 1
   While 1=1
     AdvGyro.WritePort2(gyroAngle)
     ColorRGB.ReadPort3(r, g, b)
-  EndWhile
-EndSub
-
-Sub I2C
-  I2CReady = 1
-  While 1=1
-    AdvPixy.getLargest(1, pixyX, pixyY, signature)
   EndWhile
 EndSub
 
@@ -88,19 +78,12 @@ EndSub
 
 Sub Display
   While 1=1 
-    LCD.Text(1, 10, 10, 2, gyroAngle)
+    LCD.Text(1, 10, 10, 2, X)
+    LCD.Text(1, 10, 40, 2, Y)
     Program.Delay(1)
     LCD.Clear()
   EndWhile
 EndSub
-
-Function Not(in number yes, out number no)
-  If yes = 0 Then
-    no = 1
-  Else
-    no = 0
-  EndIf
-EndFunction
   
 Function ColorCheck(out number isWhite, out number isOrange)
   If @b < 55 Then
@@ -108,7 +91,7 @@ Function ColorCheck(out number isWhite, out number isOrange)
   Else
     isWhite = 1
   EndIf
-  If @r > 70 Then
+  If @r > 80 Then
     isOrange = 1
   Else
     isOrange = 0
@@ -129,33 +112,44 @@ Function SteerToPoint(in number x, in number y)
   SteerControl.SetTarget(headingDifference)
 EndFunction
 
-Function DriveToPoint(in number x, in number y)
-  While @X <= x - 5 Or @Y <= y - 5 Or @Y >= y + 5
-    SteerToPoint(x, y)
-  EndWhile
-  Speaker.Tone(100, 300, 100)
-EndFunction
-
 Function StartReset(in number turnAngle)
-  If @X > 40 Then
+  If @X > 50 Then
     resetX = @X - 15
   Else 
     resetX = @X + 35
   EndIf
+  If @clockWise = 1 Then
+    @yPos = -20
+    If @fDistance < 20 Then
+      resetY = @Y - 30
+    ElseIf @fDistance < 50 Then
+      resetY = @Y
+    Else
+      resetY = @Y + 30
+    EndIf
+  Else
+    @yPos = 20
+    If @sDistance < 20 Then
+      resetY = @Y + 30
+    ElseIf @sDistance < 50 Then
+      resetY = @Y
+    Else
+      resetY = @Y - 30
+    EndIf
+  EndIf
   If @clockWise = 0 Then
     AdvGyro.ResetPort2(@gyroAngle + turnAngle)
-    resetY = resetX - 100
-    resetX = -100 - @Y
+    _resetY = resetX - 100
+    _resetX = -100 - resetY
   Else
     AdvGyro.ResetPort2(@gyroAngle - turnAngle)
-    resetY = 100 - resetX
-    resetX = @Y - 100
+    _resetY = 100 - resetX
+    _resetX = resetY - 100
   EndIf
   AdvGyro.WritePort2(@gyroAngle)
-  Odometry.Reset(resetX, resetY)
+  Odometry.Reset(_resetX, _resetY)
   Odometry.Write(0, 0)
   @turnCounter++
-  Time.Reset1()
 EndFunction
 
 Function Reset(in number turnAngle)
@@ -175,33 +169,7 @@ Function Reset(in number turnAngle)
   Time.Reset1()
 EndFunction
 
-Function DriveToPoints()
-  For i = 0 To 1
-    DriveToPoint(Row.Read(@x_dot, i), Row.Read(@y_dot, i))
-  EndFor
-EndFunction
-
-Function DetourObstacle()
-  If @signature = 2 Then
-    desiredX = -0.0026 * @pixyY * @pixyY + 0.9926 * @pixyY + 26.461
-  Else
-    desiredX = 0.0026 * @pixyY * @pixyY - 0.9926 * @pixyY - 26.461
-  EndIf
-  SteerControl.SetTarget((desiredX - @pixyX) * 0.5)
-EndFunction
-
-Function Autopilot()
-  If @signature = 0 Or @Y > @yRange Or @Y < -@yRange Or @pixyY < @yCameraRange Then
-    MotorAB.SetPower(80)
-    SteerToPoint(@X + 50, 0)
-  Else
-    MotorAB.SetPower(50)
-    DetourObstacle()
-  EndIf
-EndFunction
-
 Thread.Run = UArt
-Thread.Run = I2C
 Thread.Run = Odometry
 Thread.Run = Steering
 Thread.Run = Display
@@ -209,60 +177,38 @@ Thread.Run = Display
 Function Start()
   isWhite = 1
   isOrange = 0
-  MotorAB.Start()
+  MotorAB.StartPower(60)
   While isWhite = 1
-    Autopilot()
+    SteerToPoint(@X + 50, 0)
     ColorCheck(isWhite, isOrange)
   EndWhile
   @clockwise = isOrange
   Speaker.Tone(50, 3000, 100)
   StartReset(@turnAngle)
+  Program.Delay(100)
+  If @clockWise = 0 Then
+    While @Y < 0
+      SteerToPoint(@X, @Y + 25)
+    EndWhile
+  Else
+    While @Y > 0
+      SteerToPoint(@X, @Y - 25)
+    EndWhile
+  EndIf
 EndFunction
 
-While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0 Or I2CReady = 0
+While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
   
 EndWhile
 
 Start()
-MotorAB.SetPower(60)
-
-While turnCounter < 8
-  isWhite = 1
-  isOrange = 0
-  While Time.Get1() < 500 Or isWhite = 1 Or isOrange <> clockWise
-    Autopilot()
-    ColorCheck(isWhite, isOrange)
-  EndWhile
-  Speaker.Tone(50, 3000, 100)
-  Reset(turnAngle)
-EndWhile
-
-If UTurn = 1 Then 
-  While Time.Get1() < 500 Or isWhite = 1 Or isOrange <> clockWise
-    Autopilot()
-    ColorCheck(isWhite, isOrange)
-  EndWhile
-  Speaker.Tone(50, 300, 100)
-  Not(clockWise, clockWise)
-  AdvGyro.ResetPort2(gyroAngle - 180)
-  AdvGyro.WritePort2(gyroAngle)
-  Odometry.Reset(0 - X, 0 - Y)
-  Odometry.Write(0, 0)
-  If Y > 0 Then
-    target = 40
-  Else
-    target = -40
-  EndIf
-  While Math.Abs(gyroAngle) > 20
-    SteerControl.SetTarget(target)
-  EndWhile
-EndIf
+MotorAB.SetPower(100)
 
 While turnCounter < 12
   isWhite = 1
   isOrange = 0
-  While Time.Get1() < 500 Or isWhite = 1 Or isOrange <> clockWise
-    Autopilot()
+  While Time.Get1() < 300 Or isWhite = 1 Or isOrange <> clockWise
+    SteerToPoint(@X + 50, yPos)
     ColorCheck(isWhite, isOrange)
   EndWhile
   Speaker.Tone(50, 3000, 100)
@@ -270,12 +216,13 @@ While turnCounter < 12
 EndWhile
 
 While X < 0 Or Time.Get1() < 200
-  Autopilot()
+  SteerToPoint(@X + 50, yPos)
 EndWhile
+
 MotorAB.OffAndBrake()
-Speaker.Tone(100, 3000, 400)
+Speaker.Tone(100, 3000, 300)
 Speaker.Wait()
-Speaker.Tone(100, 3000, 400)
+Speaker.Tone(100, 3000, 300)
 Speaker.Wait()
-Speaker.Tone(100, 3000, 400)
+Speaker.Tone(100, 3000, 300)
 Speaker.Wait()

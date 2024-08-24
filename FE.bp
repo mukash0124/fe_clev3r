@@ -1,4 +1,0 @@
-import "Mods\Odometry"
-
-Odometry.coefficient
-Odometry.Read(x, y)
