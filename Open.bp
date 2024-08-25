@@ -1,3 +1,4 @@
+'Importing our custom libraries
 import "Mods\Odometry"
 import "Mods\AdvEncoder"
 import "Mods\AdvGyro"
@@ -5,13 +6,13 @@ import "Mods\ColorRGB"
 import "Mods\SteerControl"
 import "Mods\AdvUltrasonic"
 
-Speaker.Tone(50, 300, 100)
-
+'Setting up proper mods for sensors
 Sensor.SetMode(1, 0)
 Sensor.SetMode(2, 0)
 Sensor.SetMode(3, 4)
 Sensor.SetMode(4, 0)
 
+'Hard reset of gyro sensor
 AdvGyro.CheckReset(2, result)
 While result = 0
   Program.Delay(1000)
@@ -19,6 +20,7 @@ While result = 0
   AdvGyro.CheckReset(2, result)
 EndWhile
 
+'Reading configuration of color sensor
 col = EV3File.OpenRead("col")
 Rmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 Rmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
@@ -28,18 +30,23 @@ Bmin = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 Bmax = EV3File.ConvertToNumber(EV3File.ReadLine(col))
 ColorRGB.Config(Rmin, Rmax, Gmin, Gmax, Bmin, Bmax)
 
+'Measuring distance to the borders using ultrasonic sensor
 AdvUltrasonic.ReadPort1(fDistance)
 AdvUltrasonic.ReadPort4(sDistance)
 
+'Configuration of our custom libraries
 Odometry.Config(15.53)
 Odometry.Reset(0, 0)
 AdvGyro.ResetPort2(0)
 AdvEncoder.Config()
 SteerControl.Config(1.5, 0.1, 3, 45, 54)
+
+'Setting up steering mechanism
 MotorC.StartPower(-80)
 Program.Delay(2000)
 MotorC.ResetCount()
 
+'Setting up basic values of our variables
 angleKp = 1.2
 angleKd = 3
 angleOld = 0
@@ -51,6 +58,7 @@ SteeringReady = 0
 OdometryReady = 0
 yPos = 0
 
+'Subprogram that continously writes down values of gyro and color sensors into variables
 Sub UArt
   UArtReady = 1
   While 1=1
@@ -59,6 +67,7 @@ Sub UArt
   EndWhile
 EndSub
 
+'Subprogram that continously puts steering wheels in the right position
 Sub Steering
   SteeringReady = 1
   While 1=1
@@ -67,6 +76,7 @@ Sub Steering
   EndWhile
 EndSub
 
+'Subprogram that continously writes down position of the robot using odometry
 Sub Odometry
   OdometryReady = 1
   While 1=1
@@ -76,15 +86,7 @@ Sub Odometry
   EndWhile
 EndSub
 
-Sub Display
-  While 1=1 
-    LCD.Text(1, 10, 10, 2, X)
-    LCD.Text(1, 10, 40, 2, Y)
-    Program.Delay(1)
-    LCD.Clear()
-  EndWhile
-EndSub
-  
+'Function to check colours of the lines
 Function ColorCheck(out number isWhite, out number isOrange)
   If @b < 55 Then
     isWhite = 0
@@ -98,11 +100,13 @@ Function ColorCheck(out number isWhite, out number isOrange)
   EndIf
 EndFunction
 
+'Function that implements basic PD controller for stabilizing steering angles
 Function AngleCore(in number angle, out number aim)
   aim = @angleKp * angle + @angleKd * (angle - @angleOld)
   @angleOld = angle
 EndFunction
 
+'Function that puts steering wheels into correct position according to some point on the game field
 Function SteerToPoint(in number x, in number y)
   deltaX = x - @X
   deltaY = y - @Y
@@ -112,6 +116,7 @@ Function SteerToPoint(in number x, in number y)
   SteerControl.SetTarget(headingDifference)
 EndFunction
 
+'Function that resets position and angle of the robot on the start
 Function StartReset(in number turnAngle)
   If @X > 50 Then
     resetX = @X - 15
@@ -152,6 +157,7 @@ Function StartReset(in number turnAngle)
   @turnCounter++
 EndFunction
 
+'Function that resets position and angle of the robot on the turns
 Function Reset(in number turnAngle)
   If @clockWise = 0 Then
     AdvGyro.ResetPort2(@gyroAngle + turnAngle)
@@ -169,11 +175,7 @@ Function Reset(in number turnAngle)
   Time.Reset1()
 EndFunction
 
-Thread.Run = UArt
-Thread.Run = Odometry
-Thread.Run = Steering
-Thread.Run = Display
-
+'Our starting function, implements logic before the first line
 Function Start()
   isWhite = 1
   isOrange = 0
@@ -197,13 +199,26 @@ Function Start()
   EndIf
 EndFunction
 
+'Running parallel subprograms that need to be ran simultaneously with the main program
+Thread.Run = UArt
+Thread.Run = Odometry
+Thread.Run = Steering
+
+'Checking that all subprograms are already initialized
 While UArtReady = 0 Or SteeringReady = 0 Or OdometryReady = 0
   
 EndWhile
 
+'Waiting for the start button to be pressed
+Buttons.Wait()
+Speaker.Tone(50, 300, 200)
+Program.Delay(500)
+
+'Calling the start function
 Start()
 MotorAB.SetPower(100)
 
+'Main loop that performs driving between lines and line checks 12 times
 While turnCounter < 12
   isWhite = 1
   isOrange = 0
@@ -215,10 +230,12 @@ While turnCounter < 12
   Reset(turnAngle)
 EndWhile
 
+'Reaching the finish point in the start area
 While X < 0 Or Time.Get1() < 200
   SteerToPoint(@X + 50, yPos)
 EndWhile
 
+'Breaking motors and playing finish sound
 MotorAB.OffAndBrake()
 Speaker.Tone(100, 3000, 300)
 Speaker.Wait()
